@@ -1,11 +1,115 @@
 ---
-import Welcome from '../components/Welcome.astro';
+// src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Calculator from '../components/Calculator.astro';
+import HelpDrawer from '../components/HelpDrawer.astro';
+import HistoryPanel from '../components/HistoryPanel.astro';
 ---
 
 <Layout>
-	<Welcome />
+  <!-- Main Page Container -->
+  <div class="relative min-h-dvh flex flex-col overflow-hidden">
+    
+    <!-- Premium Ambient Mesh Gradient Backdrop (Desktop focus, subtle on mobile) -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none -z-10 opacity-35 dark:opacity-20 transition-opacity duration-300">
+      <!-- Blob 1: Cyan -->
+      <div class="absolute -top-[10%] left-[20%] w-[350px] md:w-[600px] h-[350px] md:h-[600px] rounded-full bg-brand-cyan/40 blur-[80px] md:blur-[120px] animate-mesh-1"></div>
+      <!-- Blob 2: Violet -->
+      <div class="absolute top-[30%] -left-[10%] w-[300px] md:w-[500px] h-[300px] md:h-[500px] rounded-full bg-brand-violet/30 blur-[80px] md:blur-[110px] animate-mesh-2"></div>
+      <!-- Blob 3: Amber/Pink -->
+      <div class="absolute -bottom-[10%] right-[10%] w-[400px] md:w-[700px] h-[400px] md:h-[700px] rounded-full bg-brand-pink/20 blur-[90px] md:blur-[130px] animate-mesh-3"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="h-14 border-b border-hairline bg-canvas/75 backdrop-blur-md flex items-center justify-between px-4 md:px-6 lg:px-8 z-40 relative">
+      <div class="flex items-center gap-2">
+        <!-- Minimal delta branding logo -->
+        <svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 20h18L12 4z" fill="currentColor" fill-opacity="0.08"></path>
+        </svg>
+        <span class="text-sm font-semibold tracking-tight text-ink font-geist">SciCalcTool<span class="text-brand-link">.</span></span>
+      </div>
+
+      <!-- Header actions -->
+      <div class="flex items-center gap-3">
+        <!-- Help trigger (? button - Mobile only) -->
+        <button id="trigger-help-mobile" class="lg:hidden flex items-center justify-center w-8 h-8 rounded-full border border-hairline bg-canvas hover:bg-canvas-soft-2 text-ink text-sm font-semibold font-geist-mono shadow-2xs cursor-pointer active:scale-95 transition-transform" title="Help Guide">
+          ?
+        </button>
+
+        <!-- Dark/Light Theme Toggle -->
+        <button id="theme-toggle-btn" class="flex items-center justify-center w-8 h-8 rounded-full border border-hairline bg-canvas hover:bg-canvas-soft-2 text-ink shadow-2xs cursor-pointer active:scale-95 transition-transform" title="Toggle Theme">
+          <!-- Sun Icon (visible in Dark mode) -->
+          <svg id="theme-icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <!-- Moon Icon (visible in Light mode) -->
+          <svg id="theme-icon-moon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 3a9 9 0 1 0 9 9 9.75 9.75 0 0 0-.92-4.59 7.75 7.75 0 0 1-8.08-8.08A9.75 9.75 0 0 0 12 3Z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Layout Shell -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 lg:p-8 flex flex-col items-center justify-center lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 z-10 relative">
+      
+      <!-- Left Column: Scientific Calculator -->
+      <section class="w-full flex items-center justify-center h-full lg:h-auto">
+        <Calculator />
+      </section>
+
+      <!-- Right Column: Sidebar (History & Guide - Hidden on Mobile/Tablet) -->
+      <aside class="hidden lg:flex flex-col gap-6 h-full justify-between">
+        <HistoryPanel />
+        <HelpDrawer />
+      </aside>
+
+    </main>
+
+    <!-- Slide-up Drawer container for mobile -->
+    <HelpDrawer />
+  </div>
 </Layout>
+
+<script>
+  // ─── Theme Toggling Script ───
+  const btnTheme = document.getElementById('theme-toggle-btn');
+  btnTheme.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+
+  // ─── Mobile Slide-up Drawer Toggling Script ───
+  const btnHelp = document.getElementById('trigger-help-mobile');
+  const drawerOverlay = document.getElementById('mobile-help-drawer-overlay');
+  const drawerSheet = document.getElementById('mobile-help-drawer');
+  const btnCloseHelp = document.getElementById('close-help-drawer');
+
+  if (btnHelp && drawerOverlay && drawerSheet && btnCloseHelp) {
+    const openDrawer = (e: Event) => {
+      e.preventDefault();
+      drawerOverlay.classList.remove('pointer-events-none', 'opacity-0');
+      drawerSheet.classList.remove('translate-y-full');
+    };
+
+    const closeDrawer = (e: Event) => {
+      e.preventDefault();
+      drawerOverlay.classList.add('pointer-events-none', 'opacity-0');
+      drawerSheet.classList.add('translate-y-full');
+    };
+
+    btnHelp.addEventListener('click', openDrawer);
+    btnCloseHelp.addEventListener('click', closeDrawer);
+    
+    // Close on overlay overlay tap
+    drawerOverlay.addEventListener('click', (e) => {
+      if (e.target === drawerOverlay) {
+        drawerOverlay.classList.add('pointer-events-none', 'opacity-0');
+        drawerSheet.classList.add('translate-y-full');
+      }
+    });
+  }
+</script>

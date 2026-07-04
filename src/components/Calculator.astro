@@ -1,0 +1,704 @@
+---
+// src/components/Calculator.astro
+---
+
+<div class="w-full max-w-[540px] bg-canvas border border-hairline rounded-xl shadow-lg overflow-hidden flex flex-col h-full lg:h-auto">
+  <!-- Calculator Display Screen -->
+  <div class="bg-canvas-soft-2 p-5 border-b border-hairline flex flex-col gap-2 relative">
+    <!-- Mode status line -->
+    <div class="flex justify-between items-center text-[10px] font-geist-mono uppercase tracking-wider text-mute">
+      <div class="flex gap-3">
+        <span id="indicator-angle" class="font-bold text-brand-link">RAD</span>
+        <span id="indicator-mode" class="font-bold">Advanced</span>
+      </div>
+      <div id="indicator-status" class="flex items-center gap-1.5 text-brand-success">
+        <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+        Ready
+      </div>
+    </div>
+
+    <!-- Multi-line display screen -->
+    <div class="flex flex-col items-end justify-end select-text min-h-[92px] gap-1 font-geist-mono">
+      <!-- Top line: History or context -->
+      <div id="screen-history" class="text-xs text-mute h-5 overflow-hidden text-right whitespace-nowrap w-full truncate"></div>
+      
+      <!-- Middle line: Current active expression -->
+      <div class="w-full flex items-center justify-end overflow-x-auto no-scrollbar scroll-smooth">
+        <div id="screen-input" class="text-2xl font-semibold text-ink tracking-tight whitespace-nowrap text-right min-h-[36px] flex items-center justify-end gap-0.5">
+          <!-- Text and custom blinking cursor -->
+          <span id="expression-text"></span><span class="caret-blink text-brand-link font-normal">|</span>
+        </div>
+      </div>
+
+      <!-- Bottom line: Live preview or suggestions -->
+      <div id="screen-output" class="text-sm font-medium text-brand-link h-5 select-all overflow-hidden text-right whitespace-nowrap w-full truncate"></div>
+    </div>
+  </div>
+
+  <!-- AI / Contextual Suggestion Strip -->
+  <div class="bg-canvas border-b border-hairline px-4 py-2 flex items-center gap-2 min-h-[44px]">
+    <span class="text-[10px] font-geist-mono uppercase text-mute whitespace-nowrap">AI Suggestions:</span>
+    <div id="suggestions-container" class="flex gap-2 overflow-x-auto no-scrollbar w-full py-0.5 scroll-smooth">
+      <span class="text-xs text-mute font-geist-mono italic">Start typing to see suggestions...</span>
+    </div>
+  </div>
+
+  <!-- Calculator Controls & Keyboard Selection -->
+  <div class="flex items-center justify-between border-b border-hairline px-5 py-2 bg-canvas-soft">
+    <!-- Mode selector pill -->
+    <div class="bg-canvas border border-hairline rounded-full p-0.5 flex">
+      <button id="btn-mode-beginner" class="px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs">Beginner</button>
+      <button id="btn-mode-advanced" class="px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink">Advanced</button>
+    </div>
+
+    <!-- Trig Angle selector pill -->
+    <div id="angle-toggle-container" class="bg-canvas border border-hairline rounded-full p-0.5 flex">
+      <button id="btn-angle-deg" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink">DEG</button>
+      <button id="btn-angle-rad" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs">RAD</button>
+    </div>
+  </div>
+
+  <!-- Keyboard grids container -->
+  <div class="flex-1 bg-canvas p-4 select-none flex flex-col justify-end">
+    <!-- Beginner Keypad Grid (4 columns) -->
+    <div id="keypad-beginner" class="grid grid-cols-4 gap-2.5 w-full">
+      <button class="key-control bg-canvas-soft-2 text-brand-error border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist-mono text-sm font-semibold cursor-pointer" data-val="AC">AC</button>
+      <button class="key-control bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist-mono text-sm font-semibold cursor-pointer" data-val="DEL">DEL</button>
+      <button class="key-val bg-canvas-soft-2 text-brand-link border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist-mono text-sm font-semibold cursor-pointer" data-val="(">(</button>
+      <button class="key-val bg-canvas-soft-2 text-brand-link border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist-mono text-sm font-semibold cursor-pointer" data-val=")">)</button>
+
+      <!-- Numbers and Basic Operators -->
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val="7">7</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val="8">8</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val="9">9</button>
+      <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist-mono text-base font-bold cursor-pointer" data-val="÷">÷</button>
+
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val="4">4</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val="5">5</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val="6">6</button>
+      <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist-mono text-base font-bold cursor-pointer" data-val="×">×</button>
+
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val="1">1</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val="2">2</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val="3">3</button>
+      <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist-mono text-base font-bold cursor-pointer" data-val="-">-</button>
+
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val="0">0</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-4 rounded-md font-geist text-base font-medium cursor-pointer" data-val=".">.</button>
+      <button id="btn-equals-beginner" class="key-control col-span-2 bg-ink text-canvas hover:bg-[#2c2c2c] dark:bg-canvas dark:text-ink dark:hover:bg-[#e1e1e1] py-4 rounded-md font-geist text-base font-semibold cursor-pointer shadow-sm transition-colors text-center" data-val="=">=</button>
+    </div>
+
+    <!-- Advanced Scientific Keypad Grid (5 columns, initially visible) -->
+    <div id="keypad-advanced" class="grid grid-cols-5 gap-2 w-full hidden">
+      <!-- Scientific Functions -->
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="sin(">sin</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="cos(">cos</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="tan(">tan</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="^">x^y</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="√(">√</button>
+
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="ln(">ln</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="log(">log</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="pi">π</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="e">e</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="!">!</button>
+
+      <!-- Standard keys layout inside Advanced -->
+      <button class="key-control bg-canvas-soft-2 text-brand-error border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist-mono text-xs font-bold cursor-pointer" data-val="AC">AC</button>
+      <button class="key-control bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist-mono text-xs font-bold cursor-pointer" data-val="DEL">DEL</button>
+      <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist-mono text-xs font-bold cursor-pointer" data-val="(">(</button>
+      <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist-mono text-xs font-bold cursor-pointer" data-val=")">)</button>
+      <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist-mono text-xs font-bold cursor-pointer" data-val="mod">mod</button>
+
+      <!-- Numbers & basic operators -->
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="7">7</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="8">8</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="9">9</button>
+      <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist-mono text-sm font-bold cursor-pointer" data-val="÷">÷</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="^2">x²</button>
+
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="4">4</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="5">5</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="6">6</button>
+      <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist-mono text-sm font-bold cursor-pointer" data-val="×">×</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="10^(">10^x</button>
+
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="1">1</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="2">2</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="3">3</button>
+      <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist-mono text-sm font-bold cursor-pointer" data-val="-">-</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="abs(">abs</button>
+
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="0">0</button>
+      <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val=".">.</button>
+      <button id="btn-equals-advanced" class="key-control col-span-2 bg-ink text-canvas hover:bg-[#2c2c2c] dark:bg-canvas dark:text-ink dark:hover:bg-[#e1e1e1] py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer transition-colors shadow-sm text-center" data-val="=">=</button>
+      <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist-mono text-sm font-bold cursor-pointer" data-val="+">+</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── Mathematical Parser Engine ───
+  class MathParser {
+    constructor(angleMode = 'RAD') {
+      this.angleMode = angleMode;
+    }
+
+    tokenize(str) {
+      // Map display symbols to parsable tokens
+      let prepared = str
+        .replace(/×/g, '*')
+        .replace(/÷/g, '/')
+        .replace(/π/g, 'pi')
+        .replace(/√\(/g, 'sqrt(');
+      
+      const regex = /\d+(\.\d+)?|sin|cos|tan|ln|log|abs|sqrt|mod|pi|[e+*/^!()\-]/g;
+      let tokens = prepared.match(regex) || [];
+      return tokens;
+    }
+
+    parse(tokens) {
+      let position = 0;
+
+      const peek = () => tokens[position];
+      const consume = (expected) => {
+        if (peek() === expected) {
+          position++;
+          return true;
+        }
+        return false;
+      };
+
+      // Factorial calculations (Unary right-associative operator)
+      const factorial = (n) => {
+        if (n < 0 || !Number.isInteger(n)) return NaN;
+        if (n === 0 || n === 1) return 1;
+        let r = 1;
+        for (let i = 2; i <= n; i++) r *= i;
+        return r;
+      };
+
+      // Expr = Term (( "+" | "-" ) Term)*
+      const parseExpression = () => {
+        let value = parseTerm();
+        while (true) {
+          if (consume('+')) {
+            value += parseTerm();
+          } else if (consume('-')) {
+            value -= parseTerm();
+          } else {
+            break;
+          }
+        }
+        return value;
+      };
+
+      // Term = Factor (( "*" | "/" | "mod" ) Factor)*
+      const parseTerm = () => {
+        let value = parseFactor();
+        while (true) {
+          if (consume('*')) {
+            value *= parseFactor();
+          } else if (consume('/')) {
+            let divisor = parseFactor();
+            if (divisor === 0) throw new Error("Division by zero");
+            value /= divisor;
+          } else if (consume('mod')) {
+            value %= parseFactor();
+          } else {
+            break;
+          }
+        }
+        return value;
+      };
+
+      // Factor = Base ( "^" Factor )?  -- Exponentiation right associative
+      const parseFactor = () => {
+        let value = parseBase();
+        if (consume('^')) {
+          value = Math.pow(value, parseFactor());
+        }
+        return value;
+      };
+
+      // Base = ( "+" | "-" )? Primary "!"?
+      const parseBase = () => {
+        let neg = false;
+        if (consume('-')) neg = true;
+        else consume('+');
+
+        let value = parsePrimary();
+        
+        // Unary postfix operator (factorial)
+        while (consume('!')) {
+          value = factorial(value);
+        }
+
+        return neg ? -value : value;
+      };
+
+      // Primary = Number | Constant | Function | "(" Expr ")"
+      const parsePrimary = () => {
+        let token = peek();
+        if (!token) return 0; // Empty fallback
+
+        // Parentheses matching
+        if (consume('(')) {
+          let value = parseExpression();
+          consume(')'); // Consume closing paren if present, ignore if unmatched for flexibility
+          return value;
+        }
+
+        // Functions
+        if (['sin', 'cos', 'tan', 'ln', 'log', 'sqrt', 'abs'].includes(token)) {
+          position++;
+          consume('('); // Consume standard opening paren
+          let arg = parseExpression();
+          consume(')');
+          
+          if (token === 'sin') {
+            let rad = this.angleMode === 'DEG' ? (arg * Math.PI / 180) : arg;
+            return Math.sin(rad);
+          }
+          if (token === 'cos') {
+            let rad = this.angleMode === 'DEG' ? (arg * Math.PI / 180) : arg;
+            return Math.cos(rad);
+          }
+          if (token === 'tan') {
+            let rad = this.angleMode === 'DEG' ? (arg * Math.PI / 180) : arg;
+            return Math.tan(rad);
+          }
+          if (token === 'ln') {
+            if (arg <= 0) throw new Error("Invalid ln argument");
+            return Math.log(arg);
+          }
+          if (token === 'log') {
+            if (arg <= 0) throw new Error("Invalid log argument");
+            return Math.log10(arg);
+          }
+          if (token === 'sqrt') {
+            if (arg < 0) throw new Error("Negative square root");
+            return Math.sqrt(arg);
+          }
+          if (token === 'abs') return Math.abs(arg);
+        }
+
+        // Constants
+        if (consume('pi')) return Math.PI;
+        if (consume('e')) return Math.E;
+
+        // Parse numbers
+        if (/^\d+(\.\d+)?$/.test(token)) {
+          position++;
+          return parseFloat(token);
+        }
+
+        // Unknown token error prevention
+        position++;
+        return 0;
+      };
+
+      try {
+        let result = parseExpression();
+        if (isNaN(result)) throw new Error("Invalid mathematical operation");
+        return result;
+      } catch (err) {
+        throw err;
+      }
+    }
+
+    calculate(str) {
+      if (!str.trim()) return "";
+      
+      // Auto close open parentheses before parsing
+      let balance = 0;
+      for (let char of str) {
+        if (char === '(') balance++;
+        if (char === ')') balance--;
+      }
+      let balancedStr = str;
+      while (balance > 0) {
+        balancedStr += ')';
+        balance--;
+      }
+
+      let tokens = this.tokenize(balancedStr);
+      if (tokens.length === 0) return "";
+      return this.parse(tokens);
+    }
+  }
+
+  // ─── Calculator App State ───
+  let state = {
+    expression: "",
+    angleMode: "RAD",
+    layoutMode: "BEGINNER", // or ADVANCED
+  };
+
+  const parser = new MathParser(state.angleMode);
+
+  // Load from local storage if exists
+  if (typeof localStorage !== 'undefined') {
+    state.angleMode = localStorage.getItem('angleMode') || 'RAD';
+    state.layoutMode = localStorage.getItem('layoutMode') || 'BEGINNER';
+  }
+
+  // DOM Elements
+  const elText = document.getElementById('expression-text');
+  const elHistory = document.getElementById('screen-history');
+  const elOutput = document.getElementById('screen-output');
+  const elSuggestions = document.getElementById('suggestions-container');
+  const elAngleIndicator = document.getElementById('indicator-angle');
+  const elModeIndicator = document.getElementById('indicator-mode');
+  
+  // Controls
+  const btnBeg = document.getElementById('btn-mode-beginner');
+  const btnAdv = document.getElementById('btn-mode-advanced');
+  const btnDeg = document.getElementById('btn-angle-deg');
+  const btnRad = document.getElementById('btn-angle-rad');
+
+  const keypadBeg = document.getElementById('keypad-beginner');
+  const keypadAdv = document.getElementById('keypad-advanced');
+
+  // Trigger elements sync
+  const updateLayoutUI = () => {
+    if (state.layoutMode === 'BEGINNER') {
+      keypadBeg.classList.remove('hidden');
+      keypadAdv.classList.add('hidden');
+      btnBeg.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
+      btnAdv.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink";
+      elModeIndicator.textContent = "Beginner";
+    } else {
+      keypadBeg.classList.add('hidden');
+      keypadAdv.classList.remove('hidden');
+      btnBeg.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink";
+      btnAdv.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
+      elModeIndicator.textContent = "Advanced";
+    }
+  };
+
+  const updateAngleUI = () => {
+    parser.angleMode = state.angleMode;
+    elAngleIndicator.textContent = state.angleMode;
+    if (state.angleMode === 'DEG') {
+      btnDeg.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
+      btnRad.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink";
+    } else {
+      btnDeg.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink";
+      btnRad.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
+    }
+    evaluateLive();
+  };
+
+  // Switch handlers
+  btnBeg.addEventListener('click', () => {
+    state.layoutMode = 'BEGINNER';
+    localStorage.setItem('layoutMode', 'BEGINNER');
+    updateLayoutUI();
+  });
+  btnAdv.addEventListener('click', () => {
+    state.layoutMode = 'ADVANCED';
+    localStorage.setItem('layoutMode', 'ADVANCED');
+    updateLayoutUI();
+  });
+  btnDeg.addEventListener('click', () => {
+    state.angleMode = 'DEG';
+    localStorage.setItem('angleMode', 'DEG');
+    updateAngleUI();
+  });
+  btnRad.addEventListener('click', () => {
+    state.angleMode = 'RAD';
+    localStorage.setItem('angleMode', 'RAD');
+    updateAngleUI();
+  });
+
+  // Update screen text
+  const updateScreen = () => {
+    elText.textContent = state.expression;
+    // Scroll screen-input scrollable area to right
+    const scrollContainer = elText.parentElement;
+    if (scrollContainer) {
+      scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+    }
+    evaluateLive();
+    generateSuggestions();
+  };
+
+  // Live expression preview evaluation
+  const evaluateLive = () => {
+    if (!state.expression.trim()) {
+      elOutput.textContent = "";
+      return;
+    }
+    try {
+      const result = parser.calculate(state.expression);
+      if (result === "") {
+        elOutput.textContent = "";
+      } else {
+        // Format result cleanly
+        if (typeof result === 'number') {
+          if (isNaN(result)) {
+            elOutput.textContent = "Error: Invalid operation";
+          } else if (!isFinite(result)) {
+            elOutput.textContent = "Infinity";
+          } else {
+            // Trim floating points cleanly
+            let strRes = Number(result.toFixed(10)).toString();
+            elOutput.textContent = strRes;
+          }
+        } else {
+          elOutput.textContent = result;
+        }
+      }
+    } catch (e) {
+      elOutput.textContent = e.message;
+    }
+  };
+
+  // Perform absolute execution on "="
+  const performCalculation = () => {
+    const expr = state.expression.trim();
+    if (!expr) return;
+    try {
+      const result = parser.calculate(expr);
+      if (result !== "") {
+        let strRes = "";
+        if (typeof result === 'number') {
+          if (isNaN(result)) {
+            strRes = "Error";
+          } else if (!isFinite(result)) {
+            strRes = "Infinity";
+          } else {
+            strRes = Number(result.toFixed(10)).toString();
+          }
+        } else {
+          strRes = result.toString();
+        }
+
+        // Add to history UI
+        elHistory.textContent = `${expr} =`;
+        
+        // Push to local storage history list
+        pushToCalculationHistory(expr, strRes);
+
+        // Update display to final answer
+        state.expression = strRes;
+        updateScreen();
+        elOutput.textContent = ""; // Clear preview since it became primary
+      }
+    } catch (e) {
+      elOutput.textContent = e.message;
+    }
+  };
+
+  // Add items to historical log
+  const pushToCalculationHistory = (expr, res) => {
+    let history = JSON.parse(localStorage.getItem('calc_history') || '[]');
+    history.unshift({ expr, res, time: Date.now() });
+    // Cap history at 50 items
+    if (history.length > 50) history.pop();
+    localStorage.setItem('calc_history', JSON.stringify(history));
+
+    // Custom event to sync HistoryPanel
+    window.dispatchEvent(new CustomEvent('historyUpdated'));
+  };
+
+  // ─── Real-Time Contextual Suggestions Engine ───
+  const generateSuggestions = () => {
+    const expr = state.expression;
+    elSuggestions.innerHTML = "";
+
+    if (!expr.trim()) {
+      elSuggestions.innerHTML = `<span class="text-xs text-mute font-geist-mono italic">Start typing to see suggestions...</span>`;
+      return;
+    }
+
+    const suggestions = [];
+
+    // Helper to add suggestion
+    const addSuggestion = (label, insertionText, replacement = false) => {
+      suggestions.push({ label, insertionText, replacement });
+    };
+
+    // 1. Parentheses balance check
+    let openCount = 0;
+    for (let char of expr) {
+      if (char === '(') openCount++;
+      if (char === ')') openCount--;
+    }
+    if (openCount > 0) {
+      addSuggestion(`Close parenthesis )`, ')');
+    }
+
+    // 2. Trigonometric / log function auto brackets
+    const incompleteFunctions = [
+      { trigger: /sin$/, replacement: 'sin(' },
+      { trigger: /cos$/, replacement: 'cos(' },
+      { trigger: /tan$/, replacement: 'tan(' },
+      { trigger: /log$/, replacement: 'log(' },
+      { trigger: /ln$/, replacement: 'ln(' },
+      { trigger: /abs$/, replacement: 'abs(' },
+    ];
+    for (let func of incompleteFunctions) {
+      if (func.trigger.test(expr)) {
+        addSuggestion(`Add brackets ${func.replacement}`, '(', false);
+      }
+    }
+
+    // 3. Implicit multiplication suggestion
+    // Cases: number followed by constants/functions/parenthesis (e.g. 3pi, 2(5+5))
+    if (/\d(pi|e|sin|cos|tan|log|ln|sqrt|\()$/.test(expr)) {
+      addSuggestion(`Insert multiply ×`, '×', false);
+    }
+    // Case: ) followed by number or constant
+    if (/\)(pi|e|sin|cos|tan|log|ln|sqrt|\d|\()$/.test(expr)) {
+      addSuggestion(`Insert multiply ×`, '×', false);
+    }
+
+    // 4. Trailing operator warning or autocomplete suggestion
+    if (/[+\-×÷^mod]$/.test(expr)) {
+      addSuggestion(`Insert number`, '5');
+      addSuggestion(`Remove operator`, 'DEL', true);
+    }
+
+    // 5. Division by zero warnings
+    if (/\/\s*0+$/.test(expr)) {
+      addSuggestion(`Avoid zero division`, 'DEL', true);
+    }
+
+    // 6. Beginner deterministic layout hints
+    if (state.layoutMode === 'BEGINNER') {
+      if (/^[0-9.]+$/.test(expr)) {
+        addSuggestion(`Add basic operator (+, -, ×, ÷)`, ' + ');
+      }
+      if (openCount === 0 && expr.length > 2 && !/[+\-×÷^mod]$/.test(expr)) {
+        addSuggestion(`Solve equation =`, '=');
+      }
+    }
+
+    // Render suggestions as clickable pills
+    if (suggestions.length === 0) {
+      elSuggestions.innerHTML = `<span class="text-xs text-brand-success font-geist-mono flex items-center gap-1">✓ Valid syntax</span>`;
+    } else {
+      suggestions.forEach(s => {
+        const pill = document.createElement('button');
+        pill.className = "px-2.5 py-1 text-[11px] font-geist-mono font-medium rounded-full bg-canvas-soft-2 hover:bg-brand-link hover:text-canvas border border-hairline text-body cursor-pointer whitespace-nowrap transition-colors select-none flex-shrink-0 shadow-2xs";
+        pill.innerHTML = s.label;
+        pill.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (s.insertionText === '=') {
+            performCalculation();
+          } else if (s.insertionText === 'DEL') {
+            state.expression = state.expression.slice(0, -1);
+            updateScreen();
+          } else {
+            state.expression += s.insertionText;
+            updateScreen();
+          }
+        });
+        elSuggestions.appendChild(pill);
+      });
+    }
+  };
+
+  // ─── Button Click Routing ───
+  const handleKeyVal = (val) => {
+    if (val === '^2') {
+      state.expression += '^2';
+    } else if (val === '10^(') {
+      state.expression += '10^(';
+    } else {
+      state.expression += val;
+    }
+    updateScreen();
+  };
+
+  const handleKeyControl = (val) => {
+    if (val === 'AC') {
+      state.expression = "";
+      elHistory.textContent = "";
+      updateScreen();
+    } else if (val === 'DEL') {
+      // Check if delete can backspace entire function blocks
+      const functionsToBack = ['sin(', 'cos(', 'tan(', 'log(', 'ln(', 'abs(', '10^('];
+      let matchedFunc = false;
+      for (let f of functionsToBack) {
+        if (state.expression.endsWith(f)) {
+          state.expression = state.expression.slice(0, -f.length);
+          matchedFunc = true;
+          break;
+        }
+      }
+      if (!matchedFunc) {
+        state.expression = state.expression.slice(0, -1);
+      }
+      updateScreen();
+    } else if (val === '=') {
+      performCalculation();
+    }
+  };
+
+  // Attach Grid Event Listeners
+  document.querySelectorAll('.key-val').forEach(btn => {
+    btn.addEventListener('click', () => {
+      handleKeyVal(btn.getAttribute('data-val'));
+    });
+  });
+
+  document.querySelectorAll('.key-control').forEach(btn => {
+    btn.addEventListener('click', () => {
+      handleKeyControl(btn.getAttribute('data-val'));
+    });
+  });
+
+  // ─── Physical Keyboard Listening ───
+  window.addEventListener('keydown', (e) => {
+    // Prevent typing into other input elements if any are active
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+      return;
+    }
+
+    const key = e.key;
+
+    if (key >= '0' && key <= '9') {
+      handleKeyVal(key);
+    } else if (key === '.') {
+      handleKeyVal('.');
+    } else if (key === '+') {
+      handleKeyVal('+');
+    } else if (key === '-') {
+      handleKeyVal('-');
+    } else if (key === '*') {
+      handleKeyVal('×');
+    } else if (key === '/') {
+      handleKeyVal('÷');
+    } else if (key === '^') {
+      handleKeyVal('^');
+    } else if (key === '(') {
+      handleKeyVal('(');
+    } else if (key === ')') {
+      handleKeyVal(')');
+    } else if (key === 'Enter' || key === '=') {
+      e.preventDefault();
+      performCalculation();
+    } else if (key === 'Backspace') {
+      handleKeyControl('DEL');
+    } else if (key === 'Escape') {
+      handleKeyControl('AC');
+    } else if (key === '!') {
+      handleKeyVal('!');
+    }
+  });
+
+  // Handle external loading from sidebar history clicking
+  window.addEventListener('loadHistoryItem', (e: any) => {
+    if (e.detail && e.detail.expr) {
+      state.expression = e.detail.expr;
+      updateScreen();
+    }
+  });
+
+  // Apply initially
+  updateLayoutUI();
+  updateAngleUI();
+</script>

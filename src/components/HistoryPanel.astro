@@ -1,0 +1,64 @@
+---
+// src/components/HistoryPanel.astro
+---
+
+<div class="flex flex-col gap-4 bg-canvas border border-hairline rounded-lg p-5 shadow-sm h-full max-h-[300px] overflow-hidden">
+  <div class="flex items-center justify-between border-b border-hairline pb-3">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-brand-violet"></span>
+      <h3 class="text-xs font-semibold tracking-tight uppercase font-geist-mono text-body">Calculation History</h3>
+    </div>
+    <button id="clear-history-btn" class="text-[10px] font-geist-mono text-mute hover:text-brand-error cursor-pointer">
+      [clear]
+    </button>
+  </div>
+
+  <div id="history-list" class="flex-1 overflow-y-auto flex flex-col gap-3 font-geist-mono text-xs no-scrollbar">
+    <div class="text-mute italic text-center py-4">No calculations yet.</div>
+  </div>
+</div>
+
+<script>
+  const elList = document.getElementById('history-list');
+  const btnClear = document.getElementById('clear-history-btn');
+
+  const renderHistory = () => {
+    const history = JSON.parse(localStorage.getItem('calc_history') || '[]');
+    elList.innerHTML = "";
+
+    if (history.length === 0) {
+      elList.innerHTML = `<div class="text-mute italic text-center py-4">No calculations yet.</div>`;
+      return;
+    }
+
+    history.forEach((item, index) => {
+      const row = document.createElement('button');
+      row.className = "flex flex-col items-end gap-1 p-2.5 rounded-md hover:bg-canvas-soft border border-transparent hover:border-hairline transition-all w-full text-right cursor-pointer select-none";
+      row.innerHTML = `
+        <div class="text-mute text-[10px] max-w-full truncate">${item.expr}</div>
+        <div class="text-ink font-semibold text-xs truncate max-w-full font-geist-mono text-brand-link">= ${item.res}</div>
+      `;
+      row.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Dispatch event to load this expression back into the calculator
+        window.dispatchEvent(new CustomEvent('loadHistoryItem', {
+          detail: { expr: item.expr }
+        }));
+      });
+      elList.appendChild(row);
+    });
+  };
+
+  // Listen to custom updates from the Calculator component
+  window.addEventListener('historyUpdated', renderHistory);
+
+  // Clear history handler
+  btnClear.addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.setItem('calc_history', '[]');
+    renderHistory();
+  });
+
+  // Initial render on load
+  renderHistory();
+</script>
