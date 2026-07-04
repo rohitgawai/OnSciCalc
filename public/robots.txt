@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://onscicalc.com/sitemap-index.xml
