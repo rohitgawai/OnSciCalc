@@ -63,13 +63,13 @@ import HistoryPanel from '../components/HistoryPanel.astro';
       <!-- Right Column: Sidebar (History & Guide - Hidden on Mobile/Tablet) -->
       <aside class="hidden lg:flex flex-col gap-6 h-full justify-between">
         <HistoryPanel />
-        <HelpDrawer />
+        <HelpDrawer mode="desktop" />
       </aside>
 
     </main>
 
     <!-- Slide-up Drawer container for mobile -->
-    <HelpDrawer />
+    <HelpDrawer mode="mobile" />
   </div>
 </Layout>
 

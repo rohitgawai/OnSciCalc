@@ -360,72 +360,22 @@
   const keypadBeg = document.getElementById('keypad-beginner');
   const keypadAdv = document.getElementById('keypad-advanced');
 
-  // Trigger elements sync
-  const updateLayoutUI = () => {
-    if (state.layoutMode === 'BEGINNER') {
-      keypadBeg.classList.remove('hidden');
-      keypadAdv.classList.add('hidden');
-      btnBeg.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
-      btnAdv.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink";
-      elModeIndicator.textContent = "Beginner";
-    } else {
-      keypadBeg.classList.add('hidden');
-      keypadAdv.classList.remove('hidden');
-      btnBeg.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink";
-      btnAdv.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
-      elModeIndicator.textContent = "Advanced";
-    }
-  };
+  // ─── Calculator Actions ───
 
-  const updateAngleUI = () => {
-    parser.angleMode = state.angleMode;
-    elAngleIndicator.textContent = state.angleMode;
-    if (state.angleMode === 'DEG') {
-      btnDeg.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
-      btnRad.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink";
-    } else {
-      btnDeg.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink";
-      btnRad.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
-    }
-    evaluateLive();
-  };
+  // 1. pushToCalculationHistory (no dependencies)
+  function pushToCalculationHistory(expr, res) {
+    let history = JSON.parse(localStorage.getItem('calc_history') || '[]');
+    history.unshift({ expr, res, time: Date.now() });
+    // Cap history at 50 items
+    if (history.length > 50) history.pop();
+    localStorage.setItem('calc_history', JSON.stringify(history));
 
-  // Switch handlers
-  btnBeg.addEventListener('click', () => {
-    state.layoutMode = 'BEGINNER';
-    localStorage.setItem('layoutMode', 'BEGINNER');
-    updateLayoutUI();
-  });
-  btnAdv.addEventListener('click', () => {
-    state.layoutMode = 'ADVANCED';
-    localStorage.setItem('layoutMode', 'ADVANCED');
-    updateLayoutUI();
-  });
-  btnDeg.addEventListener('click', () => {
-    state.angleMode = 'DEG';
-    localStorage.setItem('angleMode', 'DEG');
-    updateAngleUI();
-  });
-  btnRad.addEventListener('click', () => {
-    state.angleMode = 'RAD';
-    localStorage.setItem('angleMode', 'RAD');
-    updateAngleUI();
-  });
+    // Custom event to sync HistoryPanel
+    window.dispatchEvent(new CustomEvent('historyUpdated'));
+  }
 
-  // Update screen text
-  const updateScreen = () => {
-    elText.textContent = state.expression;
-    // Scroll screen-input scrollable area to right
-    const scrollContainer = elText.parentElement;
-    if (scrollContainer) {
-      scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-    }
-    evaluateLive();
-    generateSuggestions();
-  };
-
-  // Live expression preview evaluation
-  const evaluateLive = () => {
+  // 2. evaluateLive (depends on parser)
+  function evaluateLive() {
     if (!state.expression.trim()) {
       elOutput.textContent = "";
       return;
@@ -453,10 +403,10 @@
     } catch (e) {
       elOutput.textContent = e.message;
     }
-  };
+  }
 
-  // Perform absolute execution on "="
-  const performCalculation = () => {
+  // 3. performCalculation (depends on evaluateLive, pushToCalculationHistory, updateScreen)
+  function performCalculation() {
     const expr = state.expression.trim();
     if (!expr) return;
     try {
@@ -489,22 +439,10 @@
     } catch (e) {
       elOutput.textContent = e.message;
     }
-  };
+  }
 
-  // Add items to historical log
-  const pushToCalculationHistory = (expr, res) => {
-    let history = JSON.parse(localStorage.getItem('calc_history') || '[]');
-    history.unshift({ expr, res, time: Date.now() });
-    // Cap history at 50 items
-    if (history.length > 50) history.pop();
-    localStorage.setItem('calc_history', JSON.stringify(history));
-
-    // Custom event to sync HistoryPanel
-    window.dispatchEvent(new CustomEvent('historyUpdated'));
-  };
-
-  // ─── Real-Time Contextual Suggestions Engine ───
-  const generateSuggestions = () => {
+  // 4. generateSuggestions (depends on performCalculation, updateScreen)
+  function generateSuggestions() {
     const expr = state.expression;
     elSuggestions.innerHTML = "";
 
@@ -599,10 +537,53 @@
         elSuggestions.appendChild(pill);
       });
     }
-  };
+  }
 
-  // ─── Button Click Routing ───
-  const handleKeyVal = (val) => {
+  // 5. updateScreen (depends on evaluateLive, generateSuggestions)
+  function updateScreen() {
+    elText.textContent = state.expression;
+    // Scroll screen-input scrollable area to right
+    const scrollContainer = elText.parentElement;
+    if (scrollContainer) {
+      scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+    }
+    evaluateLive();
+    generateSuggestions();
+  }
+
+  // 6. updateAngleUI (depends on evaluateLive)
+  function updateAngleUI() {
+    parser.angleMode = state.angleMode;
+    elAngleIndicator.textContent = state.angleMode;
+    if (state.angleMode === 'DEG') {
+      btnDeg.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
+      btnRad.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink";
+    } else {
+      btnDeg.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink";
+      btnRad.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
+    }
+    evaluateLive();
+  }
+
+  // 7. updateLayoutUI (no dependencies)
+  function updateLayoutUI() {
+    if (state.layoutMode === 'BEGINNER') {
+      keypadBeg.classList.remove('hidden');
+      keypadAdv.classList.add('hidden');
+      btnBeg.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
+      btnAdv.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink";
+      elModeIndicator.textContent = "Beginner";
+    } else {
+      keypadBeg.classList.add('hidden');
+      keypadAdv.classList.remove('hidden');
+      btnBeg.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink";
+      btnAdv.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
+      elModeIndicator.textContent = "Advanced";
+    }
+  }
+
+  // 8. handleKeyVal (depends on updateScreen)
+  function handleKeyVal(val) {
     if (val === '^2') {
       state.expression += '^2';
     } else if (val === '10^(') {
@@ -611,9 +592,10 @@
       state.expression += val;
     }
     updateScreen();
-  };
+  }
 
-  const handleKeyControl = (val) => {
+  // 9. handleKeyControl (depends on updateScreen, performCalculation)
+  function handleKeyControl(val) {
     if (val === 'AC') {
       state.expression = "";
       elHistory.textContent = "";
@@ -636,9 +618,31 @@
     } else if (val === '=') {
       performCalculation();
     }
-  };
+  }
 
-  // Attach Grid Event Listeners
+  // Switch handlers (depends on updateLayoutUI, updateAngleUI)
+  btnBeg.addEventListener('click', () => {
+    state.layoutMode = 'BEGINNER';
+    localStorage.setItem('layoutMode', 'BEGINNER');
+    updateLayoutUI();
+  });
+  btnAdv.addEventListener('click', () => {
+    state.layoutMode = 'ADVANCED';
+    localStorage.setItem('layoutMode', 'ADVANCED');
+    updateLayoutUI();
+  });
+  btnDeg.addEventListener('click', () => {
+    state.angleMode = 'DEG';
+    localStorage.setItem('angleMode', 'DEG');
+    updateAngleUI();
+  });
+  btnRad.addEventListener('click', () => {
+    state.angleMode = 'RAD';
+    localStorage.setItem('angleMode', 'RAD');
+    updateAngleUI();
+  });
+
+  // Attach Grid Event Listeners (depends on handleKeyVal, handleKeyControl)
   document.querySelectorAll('.key-val').forEach(btn => {
     btn.addEventListener('click', () => {
       handleKeyVal(btn.getAttribute('data-val'));
@@ -681,7 +685,7 @@
     } else if (key === 'Enter' || key === '=') {
       e.preventDefault();
       performCalculation();
-    } else if (key === 'Backspace') {
+    } else if (key === 'Backspace' || key === 'Delete') {
       handleKeyControl('DEL');
     } else if (key === 'Escape') {
       handleKeyControl('AC');
