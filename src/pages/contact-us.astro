@@ -1,0 +1,149 @@
+---
+import StaticPage from '../layouts/StaticPage.astro';
+---
+
+<StaticPage 
+  title="Contact Us - OnSciCalc"
+  description="Get in touch with the OnSciCalc team. Send us your questions, feedback, or suggestions about our free online scientific calculator."
+  canonical="https://onscicalc.com/contact-us"
+>
+
+  <article class="prose-custom">
+    <h1 class="text-2xl md:text-3xl font-bold text-ink font-geist tracking-tight mb-2">Contact Us</h1>
+    <p class="text-sm text-ink/50 font-geist mb-8">We'd love to hear from you.</p>
+
+    <div class="space-y-8 text-sm leading-relaxed text-ink/70 font-geist">
+
+      <section>
+        <p>
+          Whether you have a question about OnSciCalc, need help with a feature, found a bug, or want to share feedback, we're here to help. Choose the method that works best for you.
+        </p>
+      </section>
+
+      <!-- Contact Methods -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Email -->
+        <div class="border border-hairline rounded-xl p-5 bg-canvas hover:bg-canvas-soft transition-colors">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-cyan/10 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-cyan" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-ink">Email</h3>
+              <p class="text-xs text-ink/50">We reply within 24-48 hours</p>
+            </div>
+          </div>
+          <a href="mailto:contact@onscicalc.com" class="text-brand-link hover:underline text-sm no-underline">
+            contact@onscicalc.com
+          </a>
+        </div>
+
+        <!-- Website -->
+        <div class="border border-hairline rounded-xl p-5 bg-canvas hover:bg-canvas-soft transition-colors">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-violet/10 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-violet" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-ink">Website</h3>
+              <p class="text-xs text-ink/50">Visit our calculator</p>
+            </div>
+          </div>
+          <a href="/" class="text-brand-link hover:underline text-sm no-underline">
+            onscicalc.com
+          </a>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-4">Frequently Asked Questions</h2>
+        <div class="space-y-3">
+          
+          <details class="group border border-hairline rounded-lg">
+            <summary class="cursor-pointer text-sm font-medium text-ink/70 hover:text-ink transition-colors py-3 px-4">
+              How do I report a bug?
+            </summary>
+            <div class="text-sm text-ink/60 px-4 pb-3">
+              <p>
+                If you encounter a bug or unexpected behavior, please email us at <a href="mailto:contact@onscicalc.com" class="text-brand-link hover:underline">contact@onscicalc.com</a> with details about the issue, including:
+              </p>
+              <ul class="list-disc pl-5 space-y-1 mt-2">
+                <li>Your browser and version</li>
+                <li>The device you're using</li>
+                <li>Steps to reproduce the issue</li>
+                <li>What you expected vs. what happened</li>
+              </ul>
+            </div>
+          </details>
+
+          <details class="group border border-hairline rounded-lg">
+            <summary class="cursor-pointer text-sm font-medium text-ink/70 hover:text-ink transition-colors py-3 px-4">
+              Can I request a new feature?
+            </summary>
+            <div class="text-sm text-ink/60 px-4 pb-3">
+              <p>
+                Absolutely! We welcome feature requests. Send us an email describing the feature you'd like to see, and explain how it would benefit you and other users. We review all requests and prioritize based on community demand.
+              </p>
+            </div>
+          </details>
+
+          <details class="group border border-hairline rounded-lg">
+            <summary class="cursor-pointer text-sm font-medium text-ink/70 hover:text-ink transition-colors py-3 px-4">
+              Is OnSciCalc really free?
+            </summary>
+            <div class="text-sm text-ink/60 px-4 pb-3">
+              <p>
+                Yes, OnSciCalc is completely free to use. There are no hidden fees, no premium tiers, and no account required. We believe everyone should have access to reliable mathematical tools.
+              </p>
+            </div>
+          </details>
+
+          <details class="group border border-hairline rounded-lg">
+            <summary class="cursor-pointer text-sm font-medium text-ink/70 hover:text-ink transition-colors py-3 px-4">
+              Do you store my calculation history?
+            </summary>
+            <div class="text-sm text-ink/60 px-4 pb-3">
+              <p>
+                No. Your calculation history is stored locally in your browser using <code class="text-xs bg-canvas-soft-2 px-1.5 py-0.5 rounded font-geist-mono">localStorage</code> and never leaves your device. We have no access to your calculations.
+              </p>
+            </div>
+          </details>
+
+          <details class="group border border-hairline rounded-lg">
+            <summary class="cursor-pointer text-sm font-medium text-ink/70 hover:text-ink transition-colors py-3 px-4">
+              How can I support OnSciCalc?
+            </summary>
+            <div class="text-sm text-ink/60 px-4 pb-3">
+              <p>
+                The best way to support us is to:
+              </p>
+              <ul class="list-disc pl-5 space-y-1 mt-2">
+                <li>Share OnSciCalc with friends, classmates, and colleagues</li>
+                <li>Link to us from your website or blog</li>
+                <li>Leave us positive feedback</li>
+                <li>Report bugs so we can improve</li>
+              </ul>
+            </div>
+          </details>
+
+        </div>
+      </section>
+
+      <section class="border-t border-hairline pt-6">
+        <p class="text-sm text-ink/50">
+          We aim to respond to all inquiries within 24-48 hours during business days. For urgent matters, please use the email link above for the fastest response.
+        </p>
+      </section>
+
+    </div>
+  </article>
+
+</StaticPage>

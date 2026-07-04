@@ -223,6 +223,56 @@ import HistoryPanel from '../components/HistoryPanel.astro';
       </details>
     </div>
 
+    <!-- Footer -->
+    <footer class="border-t border-hairline bg-canvas/75 backdrop-blur-md z-10 relative mt-auto">
+      <div class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+          <!-- Brand -->
+          <div class="col-span-2 md:col-span-1">
+            <div class="flex items-center gap-2 mb-3">
+              <svg class="w-4 h-4 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 20h18L12 4z" fill="currentColor" fill-opacity="0.08"></path>
+              </svg>
+              <span class="text-sm font-semibold tracking-tight text-ink font-geist">OnSciCalc<span class="text-brand-link">.</span></span>
+            </div>
+            <p class="text-xs text-ink/50 leading-relaxed">Free online scientific calculator for students, engineers, and professionals.</p>
+          </div>
+
+          <!-- Quick Links -->
+          <div>
+            <h4 class="text-xs font-semibold text-ink/70 uppercase tracking-wider mb-3 font-geist">Quick Links</h4>
+            <ul class="space-y-2">
+              <li><a href="/" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Calculator</a></li>
+              <li><a href="/about-us" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">About Us</a></li>
+              <li><a href="/contact-us" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Contact Us</a></li>
+            </ul>
+          </div>
+
+          <!-- Legal -->
+          <div>
+            <h4 class="text-xs font-semibold text-ink/70 uppercase tracking-wider mb-3 font-geist">Legal</h4>
+            <ul class="space-y-2">
+              <li><a href="/privacy-policy" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Privacy Policy</a></li>
+              <li><a href="/terms-and-conditions" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Terms &amp; Conditions</a></li>
+            </ul>
+          </div>
+
+          <!-- Connect -->
+          <div>
+            <h4 class="text-xs font-semibold text-ink/70 uppercase tracking-wider mb-3 font-geist">Connect</h4>
+            <ul class="space-y-2">
+              <li><a href="mailto:contact@onscicalc.com" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Email Us</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p class="text-xs text-ink/40 font-geist">&copy; {new Date().getFullYear()} OnSciCalc. All rights reserved.</p>
+          <p class="text-xs text-ink/40 font-geist">Made with precision.</p>
+        </div>
+      </div>
+    </footer>
+
   </div>
 </Layout>
 
