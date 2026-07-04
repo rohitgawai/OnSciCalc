@@ -99,7 +99,7 @@
 
       <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="ln(">ln</button>
       <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="log(">log</button>
-      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="pi">π</button>
+      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="π">π</button>
       <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="e">e</button>
       <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="!">!</button>
 
@@ -157,6 +157,37 @@
       return tokens;
     }
 
+    insertImplicitMultiplication(tokens) {
+      const result = [];
+      for (let i = 0; i < tokens.length; i++) {
+        result.push(tokens[i]);
+        if (i < tokens.length - 1) {
+          const curr = tokens[i];
+          const next = tokens[i + 1];
+          
+          const currIsNum = /^\d+(\.\d+)?$/.test(curr);
+          const currIsConst = ['pi', 'e'].includes(curr);
+          const currIsParenClose = curr === ')';
+          const currIsFactorial = curr === '!';
+          
+          const nextIsNum = /^\d+(\.\d+)?$/.test(next);
+          const nextIsConst = ['pi', 'e'].includes(next);
+          const nextIsFunc = ['sin', 'cos', 'tan', 'ln', 'log', 'sqrt', 'abs'].includes(next);
+          const nextIsParenOpen = next === '(';
+          
+          if (
+            (currIsNum && (nextIsConst || nextIsFunc || nextIsParenOpen)) ||
+            (currIsConst && (nextIsNum || nextIsConst || nextIsFunc || nextIsParenOpen)) ||
+            (currIsParenClose && (nextIsNum || nextIsConst || nextIsFunc || nextIsParenOpen)) ||
+            (currIsFactorial && (nextIsNum || nextIsConst || nextIsFunc || nextIsParenOpen))
+          ) {
+            result.push('*');
+          }
+        }
+      }
+      return result;
+    }
+
     parse(tokens) {
       let position = 0;
 
@@ -178,7 +209,7 @@
         return r;
       };
 
-      // Expr = Term (( "+" | "-" ) Term)*
+      // Expression = Term (( "+" | "-" ) Term)*
       const parseExpression = () => {
         let value = parseTerm();
         while (true) {
@@ -193,18 +224,18 @@
         return value;
       };
 
-      // Term = Factor (( "*" | "/" | "mod" ) Factor)*
+      // Term = Unary (( "*" | "/" | "mod" ) Unary)*
       const parseTerm = () => {
-        let value = parseFactor();
+        let value = parseUnary();
         while (true) {
           if (consume('*')) {
-            value *= parseFactor();
+            value *= parseUnary();
           } else if (consume('/')) {
-            let divisor = parseFactor();
+            let divisor = parseUnary();
             if (divisor === 0) throw new Error("Division by zero");
             value /= divisor;
           } else if (consume('mod')) {
-            value %= parseFactor();
+            value %= parseUnary();
           } else {
             break;
           }
@@ -212,32 +243,34 @@
         return value;
       };
 
-      // Factor = Base ( "^" Factor )?  -- Exponentiation right associative
-      const parseFactor = () => {
-        let value = parseBase();
+      // Unary = ( "+" | "-" ) Unary | parseExponent
+      const parseUnary = () => {
+        if (consume('-')) {
+          return -parseUnary();
+        }
+        consume('+'); // Ignore unary plus
+        return parseExponent();
+      };
+
+      // Exponent = Factor ( "^" parseUnary )?
+      const parseExponent = () => {
+        let value = parseFactor();
         if (consume('^')) {
-          value = Math.pow(value, parseFactor());
+          value = Math.pow(value, parseUnary());
         }
         return value;
       };
 
-      // Base = ( "+" | "-" )? Primary "!"?
-      const parseBase = () => {
-        let neg = false;
-        if (consume('-')) neg = true;
-        else consume('+');
-
+      // Factor = parsePrimary "!"*
+      const parseFactor = () => {
         let value = parsePrimary();
-        
-        // Unary postfix operator (factorial)
         while (consume('!')) {
           value = factorial(value);
         }
-
-        return neg ? -value : value;
+        return value;
       };
 
-      // Primary = Number | Constant | Function | "(" Expr ")"
+      // Primary = Number | Constant | Function | "(" parseExpression ")"
       const parsePrimary = () => {
         let token = peek();
         if (!token) return 0; // Empty fallback
@@ -258,15 +291,21 @@
           
           if (token === 'sin') {
             let rad = this.angleMode === 'DEG' ? (arg * Math.PI / 180) : arg;
-            return Math.sin(rad);
+            let val = Math.sin(rad);
+            return Math.abs(val) < 1e-15 ? 0 : val;
           }
           if (token === 'cos') {
             let rad = this.angleMode === 'DEG' ? (arg * Math.PI / 180) : arg;
-            return Math.cos(rad);
+            let val = Math.cos(rad);
+            return Math.abs(val) < 1e-15 ? 0 : val;
           }
           if (token === 'tan') {
             let rad = this.angleMode === 'DEG' ? (arg * Math.PI / 180) : arg;
-            return Math.tan(rad);
+            if (Math.abs(Math.cos(rad)) < 1e-15) {
+              throw new Error("Tangent undefined");
+            }
+            let val = Math.tan(rad);
+            return Math.abs(val) < 1e-15 ? 0 : val;
           }
           if (token === 'ln') {
             if (arg <= 0) throw new Error("Invalid ln argument");
@@ -300,6 +339,9 @@
 
       try {
         let result = parseExpression();
+        if (position < tokens.length) {
+          throw new Error("Syntax Error");
+        }
         if (isNaN(result)) throw new Error("Invalid mathematical operation");
         return result;
       } catch (err) {
@@ -324,6 +366,7 @@
 
       let tokens = this.tokenize(balancedStr);
       if (tokens.length === 0) return "";
+      tokens = this.insertImplicitMultiplication(tokens);
       return this.parse(tokens);
     }
   }
@@ -484,12 +527,12 @@
     }
 
     // 3. Implicit multiplication suggestion
-    // Cases: number followed by constants/functions/parenthesis (e.g. 3pi, 2(5+5))
-    if (/\d(pi|e|sin|cos|tan|log|ln|sqrt|\()$/.test(expr)) {
+    // Cases: number followed by constants/functions/parenthesis (e.g. 3pi, 3π, 2(5+5))
+    if (/\d(pi|π|e|sin|cos|tan|log|ln|sqrt|\()$/.test(expr)) {
       addSuggestion(`Insert multiply ×`, '×', false);
     }
     // Case: ) followed by number or constant
-    if (/\)(pi|e|sin|cos|tan|log|ln|sqrt|\d|\()$/.test(expr)) {
+    if (/\)(pi|π|e|sin|cos|tan|log|ln|sqrt|\d|\()$/.test(expr)) {
       addSuggestion(`Insert multiply ×`, '×', false);
     }
 
@@ -602,7 +645,7 @@
       updateScreen();
     } else if (val === 'DEL') {
       // Check if delete can backspace entire function blocks
-      const functionsToBack = ['sin(', 'cos(', 'tan(', 'log(', 'ln(', 'abs(', '10^('];
+      const functionsToBack = ['sin(', 'cos(', 'tan(', 'log(', 'ln(', 'abs(', '10^(', '√(', ' mod ', 'mod'];
       let matchedFunc = false;
       for (let f of functionsToBack) {
         if (state.expression.endsWith(f)) {
@@ -662,6 +705,11 @@
       return;
     }
 
+    // Ignore keyboard shortcuts with Ctrl/Cmd/Alt modifier keys
+    if (e.ctrlKey || e.altKey || e.metaKey) {
+      return;
+    }
+
     const key = e.key;
 
     if (key >= '0' && key <= '9') {
@@ -691,6 +739,26 @@
       handleKeyControl('AC');
     } else if (key === '!') {
       handleKeyVal('!');
+    } else if (key.toLowerCase() === 'p') {
+      handleKeyVal('π');
+    } else if (key.toLowerCase() === 'e') {
+      handleKeyVal('e');
+    } else if (key.toLowerCase() === 's') {
+      handleKeyVal('sin(');
+    } else if (key.toLowerCase() === 'c') {
+      handleKeyVal('cos(');
+    } else if (key.toLowerCase() === 't') {
+      handleKeyVal('tan(');
+    } else if (key.toLowerCase() === 'l') {
+      handleKeyVal('log(');
+    } else if (key.toLowerCase() === 'n') {
+      handleKeyVal('ln(');
+    } else if (key.toLowerCase() === 'q') {
+      handleKeyVal('√(');
+    } else if (key.toLowerCase() === 'a') {
+      handleKeyVal('abs(');
+    } else if (key.toLowerCase() === 'm') {
+      handleKeyVal('mod');
     }
   });
 
