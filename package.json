@@ -10,6 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "deploy": "wrangler pages deploy dist --project-name=onscicalc --branch=master",
     "generate-types": "wrangler types"
   },
   "dependencies": {
