@@ -51,10 +51,18 @@
       <button id="btn-mode-advanced" class="px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink">Advanced</button>
     </div>
 
-    <!-- Trig Angle selector pill -->
-    <div id="angle-toggle-container" class="bg-canvas border border-hairline rounded-full p-0.5 flex">
-      <button id="btn-angle-deg" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink">DEG</button>
-      <button id="btn-angle-rad" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs">RAD</button>
+    <!-- Trig Angle & Second toggles -->
+    <div class="flex gap-2 items-center">
+      <!-- 2nd Shift selector pill -->
+      <div id="second-toggle-container" class="bg-canvas border border-hairline rounded-full p-0.5 flex hidden">
+        <button id="btn-second" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink">2nd</button>
+      </div>
+
+      <!-- Trig Angle selector pill -->
+      <div id="angle-toggle-container" class="bg-canvas border border-hairline rounded-full p-0.5 flex">
+        <button id="btn-angle-deg" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink">DEG</button>
+        <button id="btn-angle-rad" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs">RAD</button>
+      </div>
     </div>
   </div>
 
@@ -91,9 +99,9 @@
     <!-- Advanced Scientific Keypad Grid (5 columns, initially visible) -->
     <div id="keypad-advanced" class="grid grid-cols-5 gap-2 w-full hidden">
       <!-- Scientific Functions -->
-      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="sin(">sin</button>
-      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="cos(">cos</button>
-      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="tan(">tan</button>
+      <button id="btn-trig-sin" class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="sin(">sin</button>
+      <button id="btn-trig-cos" class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="cos(">cos</button>
+      <button id="btn-trig-tan" class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="tan(">tan</button>
       <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="^">x^y</button>
       <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="√(">√</button>
 
@@ -150,9 +158,12 @@
         .replace(/×/g, '*')
         .replace(/÷/g, '/')
         .replace(/π/g, 'pi')
-        .replace(/√\(/g, 'sqrt(');
+        .replace(/√\(/g, 'sqrt(')
+        .replace(/sin⁻¹\(/g, 'asin(')
+        .replace(/cos⁻¹\(/g, 'acos(')
+        .replace(/tan⁻¹\(/g, 'atan(');
       
-      const regex = /\d+(\.\d+)?|sin|cos|tan|ln|log|abs|sqrt|mod|pi|[e+*/^!()\-]/g;
+      const regex = /\d+(\.\d+)?|asin|acos|atan|sin|cos|tan|ln|log|abs|sqrt|mod|pi|[e+*/^!()\-]/g;
       let tokens = prepared.match(regex) || [];
       return tokens;
     }
@@ -172,7 +183,7 @@
           
           const nextIsNum = /^\d+(\.\d+)?$/.test(next);
           const nextIsConst = ['pi', 'e'].includes(next);
-          const nextIsFunc = ['sin', 'cos', 'tan', 'ln', 'log', 'sqrt', 'abs'].includes(next);
+          const nextIsFunc = ['sin', 'cos', 'tan', 'ln', 'log', 'sqrt', 'abs', 'asin', 'acos', 'atan'].includes(next);
           const nextIsParenOpen = next === '(';
           
           if (
@@ -283,7 +294,7 @@
         }
 
         // Functions
-        if (['sin', 'cos', 'tan', 'ln', 'log', 'sqrt', 'abs'].includes(token)) {
+        if (['sin', 'cos', 'tan', 'ln', 'log', 'sqrt', 'abs', 'asin', 'acos', 'atan'].includes(token)) {
           position++;
           consume('('); // Consume standard opening paren
           let arg = parseExpression();
@@ -306,6 +317,23 @@
             }
             let val = Math.tan(rad);
             return Math.abs(val) < 1e-15 ? 0 : val;
+          }
+          if (token === 'asin') {
+            if (arg < -1 || arg > 1) throw new Error("asin domain: [-1, 1]");
+            let val = Math.asin(arg);
+            let result = this.angleMode === 'DEG' ? (val * 180 / Math.PI) : val;
+            return Math.abs(result) < 1e-15 ? 0 : result;
+          }
+          if (token === 'acos') {
+            if (arg < -1 || arg > 1) throw new Error("acos domain: [-1, 1]");
+            let val = Math.acos(arg);
+            let result = this.angleMode === 'DEG' ? (val * 180 / Math.PI) : val;
+            return Math.abs(result) < 1e-15 ? 0 : result;
+          }
+          if (token === 'atan') {
+            let val = Math.atan(arg);
+            let result = this.angleMode === 'DEG' ? (val * 180 / Math.PI) : val;
+            return Math.abs(result) < 1e-15 ? 0 : result;
           }
           if (token === 'ln') {
             if (arg <= 0) throw new Error("Invalid ln argument");
@@ -376,6 +404,7 @@
     expression: "",
     angleMode: "RAD",
     layoutMode: "BEGINNER", // or ADVANCED
+    secondActive: false,
   };
 
   const parser = new MathParser(state.angleMode);
@@ -516,6 +545,12 @@
       { trigger: /sin$/, replacement: 'sin(' },
       { trigger: /cos$/, replacement: 'cos(' },
       { trigger: /tan$/, replacement: 'tan(' },
+      { trigger: /asin$/, replacement: 'asin(' },
+      { trigger: /acos$/, replacement: 'acos(' },
+      { trigger: /atan$/, replacement: 'atan(' },
+      { trigger: /sin⁻¹$/, replacement: 'sin⁻¹(' },
+      { trigger: /cos⁻¹$/, replacement: 'cos⁻¹(' },
+      { trigger: /tan⁻¹$/, replacement: 'tan⁻¹(' },
       { trigger: /log$/, replacement: 'log(' },
       { trigger: /ln$/, replacement: 'ln(' },
       { trigger: /abs$/, replacement: 'abs(' },
@@ -528,12 +563,17 @@
 
     // 3. Implicit multiplication suggestion
     // Cases: number followed by constants/functions/parenthesis (e.g. 3pi, 3π, 2(5+5))
-    if (/\d(pi|π|e|sin|cos|tan|log|ln|sqrt|\()$/.test(expr)) {
+    if (/\d(pi|π|e|sin|cos|tan|asin|acos|atan|sin⁻¹|cos⁻¹|tan⁻¹|log|ln|sqrt|\()$/.test(expr)) {
       addSuggestion(`Insert multiply ×`, '×', false);
     }
     // Case: ) followed by number or constant
-    if (/\)(pi|π|e|sin|cos|tan|log|ln|sqrt|\d|\()$/.test(expr)) {
+    if (/\)(pi|π|e|sin|cos|tan|asin|acos|atan|sin⁻¹|cos⁻¹|tan⁻¹|log|ln|sqrt|\d|\()$/.test(expr)) {
       addSuggestion(`Insert multiply ×`, '×', false);
+    }
+
+    // Dynamic tip for inverse trig functions when typing trig functions
+    if (/(sin|cos|tan)$/.test(expr)) {
+      addSuggestion(`💡 Tip: Toggle "2nd" for inverse functions`, '2ND_TIP', false);
     }
 
     // 4. Trailing operator warning or autocomplete suggestion
@@ -572,6 +612,9 @@
           } else if (s.insertionText === 'DEL') {
             state.expression = state.expression.slice(0, -1);
             updateScreen();
+          } else if (s.insertionText === '2ND_TIP') {
+            state.secondActive = !state.secondActive;
+            updateSecondUI();
           } else {
             state.expression += s.insertionText;
             updateScreen();
@@ -608,21 +651,68 @@
     evaluateLive();
   }
 
+  // 6b. updateSecondUI (depends on state)
+  function updateSecondUI() {
+    const btnSecond = document.getElementById('btn-second');
+    const sinBtn = document.getElementById('btn-trig-sin');
+    const cosBtn = document.getElementById('btn-trig-cos');
+    const tanBtn = document.getElementById('btn-trig-tan');
+
+    if (state.secondActive) {
+      if (btnSecond) {
+        btnSecond.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
+      }
+      if (sinBtn) {
+        sinBtn.textContent = "sin⁻¹";
+        sinBtn.setAttribute('data-val', 'sin⁻¹(');
+      }
+      if (cosBtn) {
+        cosBtn.textContent = "cos⁻¹";
+        cosBtn.setAttribute('data-val', 'cos⁻¹(');
+      }
+      if (tanBtn) {
+        tanBtn.textContent = "tan⁻¹";
+        tanBtn.setAttribute('data-val', 'tan⁻¹(');
+      }
+    } else {
+      if (btnSecond) {
+        btnSecond.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink";
+      }
+      if (sinBtn) {
+        sinBtn.textContent = "sin";
+        sinBtn.setAttribute('data-val', 'sin(');
+      }
+      if (cosBtn) {
+        cosBtn.textContent = "cos";
+        cosBtn.setAttribute('data-val', 'cos(');
+      }
+      if (tanBtn) {
+        tanBtn.textContent = "tan";
+        tanBtn.setAttribute('data-val', 'tan(');
+      }
+    }
+  }
+
   // 7. updateLayoutUI (no dependencies)
   function updateLayoutUI() {
+    const secondToggleContainer = document.getElementById('second-toggle-container');
     if (state.layoutMode === 'BEGINNER') {
       keypadBeg.classList.remove('hidden');
       keypadAdv.classList.add('hidden');
+      if (secondToggleContainer) secondToggleContainer.classList.add('hidden');
       btnBeg.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
       btnAdv.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink";
       elModeIndicator.textContent = "Beginner";
     } else {
       keypadBeg.classList.add('hidden');
       keypadAdv.classList.remove('hidden');
+      if (secondToggleContainer) secondToggleContainer.classList.remove('hidden');
       btnBeg.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink";
       btnAdv.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
       elModeIndicator.textContent = "Advanced";
     }
+    state.secondActive = false;
+    updateSecondUI();
   }
 
   // 8. handleKeyVal (depends on updateScreen)
@@ -634,6 +724,13 @@
     } else {
       state.expression += val;
     }
+
+    // Auto turn off 2nd mode after a trig value has been input
+    if (state.secondActive && (val === 'sin⁻¹(' || val === 'cos⁻¹(' || val === 'tan⁻¹(')) {
+      state.secondActive = false;
+      updateSecondUI();
+    }
+
     updateScreen();
   }
 
@@ -645,7 +742,7 @@
       updateScreen();
     } else if (val === 'DEL') {
       // Check if delete can backspace entire function blocks
-      const functionsToBack = ['sin(', 'cos(', 'tan(', 'log(', 'ln(', 'abs(', '10^(', '√(', ' mod ', 'mod'];
+      const functionsToBack = ['sin⁻¹(', 'cos⁻¹(', 'tan⁻¹(', 'sin(', 'cos(', 'tan(', 'log(', 'ln(', 'abs(', '10^(', '√(', ' mod ', 'mod'];
       let matchedFunc = false;
       for (let f of functionsToBack) {
         if (state.expression.endsWith(f)) {
@@ -684,6 +781,14 @@
     localStorage.setItem('angleMode', 'RAD');
     updateAngleUI();
   });
+
+  const btnSecond = document.getElementById('btn-second');
+  if (btnSecond) {
+    btnSecond.addEventListener('click', () => {
+      state.secondActive = !state.secondActive;
+      updateSecondUI();
+    });
+  }
 
   // Attach Grid Event Listeners (depends on handleKeyVal, handleKeyControl)
   document.querySelectorAll('.key-val').forEach(btn => {
@@ -743,12 +848,30 @@
       handleKeyVal('π');
     } else if (key.toLowerCase() === 'e') {
       handleKeyVal('e');
-    } else if (key.toLowerCase() === 's') {
-      handleKeyVal('sin(');
-    } else if (key.toLowerCase() === 'c') {
-      handleKeyVal('cos(');
-    } else if (key.toLowerCase() === 't') {
-      handleKeyVal('tan(');
+    } else if (key === 'S') {
+      handleKeyVal('sin⁻¹(');
+    } else if (key === 'C') {
+      handleKeyVal('cos⁻¹(');
+    } else if (key === 'T') {
+      handleKeyVal('tan⁻¹(');
+    } else if (key === 's') {
+      if (state.secondActive) {
+        handleKeyVal('sin⁻¹(');
+      } else {
+        handleKeyVal('sin(');
+      }
+    } else if (key === 'c') {
+      if (state.secondActive) {
+        handleKeyVal('cos⁻¹(');
+      } else {
+        handleKeyVal('cos(');
+      }
+    } else if (key === 't') {
+      if (state.secondActive) {
+        handleKeyVal('tan⁻¹(');
+      } else {
+        handleKeyVal('tan(');
+      }
     } else if (key.toLowerCase() === 'l') {
       handleKeyVal('log(');
     } else if (key.toLowerCase() === 'n') {
