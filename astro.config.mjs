@@ -5,10 +5,13 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://onscicalc.com',
+
   devToolbar: {
     enabled: false,
   },
+
   integrations: [sitemap()],
+
   vite: {
     plugins: [tailwindcss()],
   },
