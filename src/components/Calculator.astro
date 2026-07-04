@@ -103,10 +103,10 @@
       <button id="btn-trig-cos" class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="cos(">cos</button>
       <button id="btn-trig-tan" class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="tan(">tan</button>
       <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="^">x^y</button>
-      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="√(">√</button>
+      <button id="btn-fn-sqrt" class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="√(">√</button>
 
-      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="ln(">ln</button>
-      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="log(">log</button>
+      <button id="btn-fn-ln" class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="ln(">ln</button>
+      <button id="btn-fn-log" class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="log(">log</button>
       <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="π">π</button>
       <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="e">e</button>
       <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="!">!</button>
@@ -123,7 +123,7 @@
       <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="8">8</button>
       <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="9">9</button>
       <button class="key-val bg-canvas-soft-2 text-ink border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist-mono text-sm font-bold cursor-pointer" data-val="÷">÷</button>
-      <button class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="^2">x²</button>
+      <button id="btn-fn-sq" class="key-val bg-canvas-soft text-body border border-hairline hover:bg-canvas-soft-2 transition-colors py-3.5 rounded-md font-geist-mono text-xs font-semibold cursor-pointer" data-val="^2">x²</button>
 
       <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="4">4</button>
       <button class="key-val bg-canvas border border-hairline hover:bg-canvas-soft transition-colors py-3.5 rounded-md font-geist text-base font-semibold cursor-pointer" data-val="5">5</button>
@@ -159,11 +159,13 @@
         .replace(/÷/g, '/')
         .replace(/π/g, 'pi')
         .replace(/√\(/g, 'sqrt(')
+        .replace(/∛\(/g, 'cbrt(')
+        .replace(/e\^\(/g, 'exp(')
         .replace(/sin⁻¹\(/g, 'asin(')
         .replace(/cos⁻¹\(/g, 'acos(')
         .replace(/tan⁻¹\(/g, 'atan(');
       
-      const regex = /\d+(\.\d+)?|asin|acos|atan|sin|cos|tan|ln|log|abs|sqrt|mod|pi|[e+*/^!()\-]/g;
+      const regex = /\d+(\.\d+)?|asin|acos|atan|sin|cos|tan|ln|log|abs|sqrt|cbrt|exp|mod|pi|[e+*/^!()\-]/g;
       let tokens = prepared.match(regex) || [];
       return tokens;
     }
@@ -183,7 +185,7 @@
           
           const nextIsNum = /^\d+(\.\d+)?$/.test(next);
           const nextIsConst = ['pi', 'e'].includes(next);
-          const nextIsFunc = ['sin', 'cos', 'tan', 'ln', 'log', 'sqrt', 'abs', 'asin', 'acos', 'atan'].includes(next);
+          const nextIsFunc = ['sin', 'cos', 'tan', 'ln', 'log', 'sqrt', 'cbrt', 'abs', 'exp', 'asin', 'acos', 'atan'].includes(next);
           const nextIsParenOpen = next === '(';
           
           if (
@@ -294,7 +296,7 @@
         }
 
         // Functions
-        if (['sin', 'cos', 'tan', 'ln', 'log', 'sqrt', 'abs', 'asin', 'acos', 'atan'].includes(token)) {
+        if (['sin', 'cos', 'tan', 'ln', 'log', 'sqrt', 'cbrt', 'abs', 'exp', 'asin', 'acos', 'atan'].includes(token)) {
           position++;
           consume('('); // Consume standard opening paren
           let arg = parseExpression();
@@ -346,6 +348,12 @@
           if (token === 'sqrt') {
             if (arg < 0) throw new Error("Negative square root");
             return Math.sqrt(arg);
+          }
+          if (token === 'cbrt') {
+            return Math.cbrt(arg);
+          }
+          if (token === 'exp') {
+            return Math.exp(arg);
           }
           if (token === 'abs') return Math.abs(arg);
         }
@@ -563,17 +571,17 @@
 
     // 3. Implicit multiplication suggestion
     // Cases: number followed by constants/functions/parenthesis (e.g. 3pi, 3π, 2(5+5))
-    if (/\d(pi|π|e|sin|cos|tan|asin|acos|atan|sin⁻¹|cos⁻¹|tan⁻¹|log|ln|sqrt|\()$/.test(expr)) {
+    if (/\d(pi|π|e|sin|cos|tan|asin|acos|atan|sin⁻¹|cos⁻¹|tan⁻¹|log|ln|sqrt|cbrt|exp|\()$/.test(expr)) {
       addSuggestion(`Insert multiply ×`, '×', false);
     }
     // Case: ) followed by number or constant
-    if (/\)(pi|π|e|sin|cos|tan|asin|acos|atan|sin⁻¹|cos⁻¹|tan⁻¹|log|ln|sqrt|\d|\()$/.test(expr)) {
+    if (/\)(pi|π|e|sin|cos|tan|asin|acos|atan|sin⁻¹|cos⁻¹|tan⁻¹|log|ln|sqrt|cbrt|exp|\d|\()$/.test(expr)) {
       addSuggestion(`Insert multiply ×`, '×', false);
     }
 
     // Dynamic tip for inverse trig functions when typing trig functions
     if (/(sin|cos|tan)$/.test(expr)) {
-      addSuggestion(`💡 Tip: Toggle "2nd" for inverse functions`, '2ND_TIP', false);
+      addSuggestion(`💡 Tip: Toggle "2nd" for shifted functions (∛, x³, eˣ, 10ˣ)`, '2ND_TIP', false);
     }
 
     // 4. Trailing operator warning or autocomplete suggestion
@@ -657,6 +665,10 @@
     const sinBtn = document.getElementById('btn-trig-sin');
     const cosBtn = document.getElementById('btn-trig-cos');
     const tanBtn = document.getElementById('btn-trig-tan');
+    const sqrtBtn = document.getElementById('btn-fn-sqrt');
+    const sqBtn = document.getElementById('btn-fn-sq');
+    const lnBtn = document.getElementById('btn-fn-ln');
+    const logBtn = document.getElementById('btn-fn-log');
 
     if (state.secondActive) {
       if (btnSecond) {
@@ -674,6 +686,22 @@
         tanBtn.textContent = "tan⁻¹";
         tanBtn.setAttribute('data-val', 'tan⁻¹(');
       }
+      if (sqrtBtn) {
+        sqrtBtn.textContent = "∛";
+        sqrtBtn.setAttribute('data-val', '∛(');
+      }
+      if (sqBtn) {
+        sqBtn.textContent = "x³";
+        sqBtn.setAttribute('data-val', '^3');
+      }
+      if (lnBtn) {
+        lnBtn.textContent = "eˣ";
+        lnBtn.setAttribute('data-val', 'e^(');
+      }
+      if (logBtn) {
+        logBtn.textContent = "10ˣ";
+        logBtn.setAttribute('data-val', '10^(');
+      }
     } else {
       if (btnSecond) {
         btnSecond.className = "px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink";
@@ -689,6 +717,22 @@
       if (tanBtn) {
         tanBtn.textContent = "tan";
         tanBtn.setAttribute('data-val', 'tan(');
+      }
+      if (sqrtBtn) {
+        sqrtBtn.textContent = "√";
+        sqrtBtn.setAttribute('data-val', '√(');
+      }
+      if (sqBtn) {
+        sqBtn.textContent = "x²";
+        sqBtn.setAttribute('data-val', '^2');
+      }
+      if (lnBtn) {
+        lnBtn.textContent = "ln";
+        lnBtn.setAttribute('data-val', 'ln(');
+      }
+      if (logBtn) {
+        logBtn.textContent = "log";
+        logBtn.setAttribute('data-val', 'log(');
       }
     }
   }
@@ -717,16 +761,16 @@
 
   // 8. handleKeyVal (depends on updateScreen)
   function handleKeyVal(val) {
-    if (val === '^2') {
-      state.expression += '^2';
-    } else if (val === '10^(') {
-      state.expression += '10^(';
+    if (val === '^2' || val === '^3') {
+      state.expression += val;
+    } else if (val === '10^(' || val === 'e^(') {
+      state.expression += val;
     } else {
       state.expression += val;
     }
 
-    // Auto turn off 2nd mode after a trig value has been input
-    if (state.secondActive && (val === 'sin⁻¹(' || val === 'cos⁻¹(' || val === 'tan⁻¹(')) {
+    // Auto turn off 2nd mode after a shifted value has been input
+    if (state.secondActive && (val === 'sin⁻¹(' || val === 'cos⁻¹(' || val === 'tan⁻¹(' || val === '∛(' || val === '^3' || val === 'e^(' || val === '10^(')) {
       state.secondActive = false;
       updateSecondUI();
     }
@@ -742,7 +786,7 @@
       updateScreen();
     } else if (val === 'DEL') {
       // Check if delete can backspace entire function blocks
-      const functionsToBack = ['sin⁻¹(', 'cos⁻¹(', 'tan⁻¹(', 'sin(', 'cos(', 'tan(', 'log(', 'ln(', 'abs(', '10^(', '√(', ' mod ', 'mod'];
+      const functionsToBack = ['sin⁻¹(', 'cos⁻¹(', 'tan⁻¹(', 'sin(', 'cos(', 'tan(', 'log(', 'ln(', 'abs(', '10^(', 'e^(', '√(', '∛(', ' mod ', 'mod'];
       let matchedFunc = false;
       for (let f of functionsToBack) {
         if (state.expression.endsWith(f)) {
@@ -873,11 +917,23 @@
         handleKeyVal('tan(');
       }
     } else if (key.toLowerCase() === 'l') {
-      handleKeyVal('log(');
+      if (state.secondActive) {
+        handleKeyVal('10^(');
+      } else {
+        handleKeyVal('log(');
+      }
     } else if (key.toLowerCase() === 'n') {
-      handleKeyVal('ln(');
+      if (state.secondActive) {
+        handleKeyVal('e^(');
+      } else {
+        handleKeyVal('ln(');
+      }
     } else if (key.toLowerCase() === 'q') {
-      handleKeyVal('√(');
+      if (state.secondActive) {
+        handleKeyVal('∛(');
+      } else {
+        handleKeyVal('√(');
+      }
     } else if (key.toLowerCase() === 'a') {
       handleKeyVal('abs(');
     } else if (key.toLowerCase() === 'm') {

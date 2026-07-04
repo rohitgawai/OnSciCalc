@@ -113,3 +113,7 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+astro-dev-toolbar {
+  display: none !important;
+}
