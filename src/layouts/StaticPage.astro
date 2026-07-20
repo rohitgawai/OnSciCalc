@@ -5,13 +5,14 @@ interface Props {
   title: string;
   description: string;
   canonical: string;
+  robots?: string;
 }
 
-const { title, description, canonical } = Astro.props;
+const { title, description, canonical, robots } = Astro.props;
 const siteUrl = "https://onscicalc.com";
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
+<Layout title={title} description={description} canonical={canonical} robots={robots}>
   <div class="min-h-dvh flex flex-col bg-canvas-soft">
 
     <!-- Header -->
@@ -47,6 +48,8 @@ const siteUrl = "https://onscicalc.com";
         </summary>
         <nav class="flex flex-col gap-1 pt-2 pb-1">
           <a href="/" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Home</a>
+          <a href="/guides" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Guides</a>
+          <a href="/blog" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Blog</a>
           <a href="/about-us" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">About Us</a>
           <a href="/privacy-policy" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Privacy Policy</a>
           <a href="/terms-and-conditions" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Terms &amp; Conditions</a>
@@ -80,6 +83,8 @@ const siteUrl = "https://onscicalc.com";
             <h4 class="text-xs font-semibold text-ink/70 uppercase tracking-wider mb-3 font-geist">Quick Links</h4>
             <ul class="space-y-2">
               <li><a href="/" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Calculator</a></li>
+              <li><a href="/guides" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Guides</a></li>
+              <li><a href="/blog" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Blog</a></li>
               <li><a href="/about-us" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">About Us</a></li>
               <li><a href="/contact-us" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Contact Us</a></li>
             </ul>

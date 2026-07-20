@@ -7,6 +7,7 @@ interface Props {
   keywords?: string;
   canonical?: string;
   ogImage?: string;
+  robots?: string;
 }
 
 const { 
@@ -14,7 +15,8 @@ const {
   description = "A free online scientific calculator with full screen mode, double-digit precision, and support for fractions, trigonometry, logarithms, and exponential functions. Works via button click or keyboard.",
   keywords = "scientific calculator online, scientific calculator online free, online scientific calculator free, scientific calculator amazon, scientific calculator app, online full screen scientific calculator, google scientific calculator, free scientific calculator online full screen scientific calculator, texas instruments scientific calculator online, online scientific calculator, scientific calculator, desmos scientific calculator, free online scientific calculator, best online scientific calculator, online scientific calculator casio, calculator, sin cos tan calculator, scientific calc, online scientific calculator for engineering, online scientific calculator fx-991es, online scientific calculator with fraction, online scientific calculator texas instruments, casio scientific calculator, graphing calculator online, scientific calculator with fractions, free calculator online, math calculator online, engineering calculator online, trig calculator, algebra calculator",
   canonical = "https://onscicalc.com/",
-  ogImage = "https://onscicalc.com/og-image.png"
+  ogImage = "https://onscicalc.com/og-image.png",
+  robots = "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
 } = Astro.props;
 
 const siteName = "OnSciCalc";
@@ -49,7 +51,7 @@ const siteUrl = "https://onscicalc.com";
 		<meta name="description" content={description} />
 		<meta name="keywords" content={keywords} />
 		<meta name="author" content="OnSciCalc" />
-		<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+		<meta name="robots" content={robots} />
 		<link rel="canonical" href={canonical} />
 
 		<!-- Open Graph / Facebook -->
@@ -97,110 +99,7 @@ const siteUrl = "https://onscicalc.com";
 			})();
 		</script>
 
-		<!-- Structured Data for Software Application -->
-		<script type="application/ld+json" set:html={JSON.stringify({
-			"@context": "https://schema.org",
-			"@type": "WebApplication",
-			"name": "OnSciCalc",
-			"url": siteUrl,
-			"description": description,
-			"applicationCategory": "UtilityApplication",
-			"operatingSystem": "Web Browser",
-			"offers": {
-				"@type": "Offer",
-				"price": "0",
-				"priceCurrency": "USD"
-			},
-			"featureList": [
-				"Scientific functions (sin, cos, tan, log, ln)",
-				"Fraction calculations",
-				"Engineering mode",
-				"History tracking",
-				"Dark/Light theme",
-				"Keyboard shortcuts"
-			],
-			"browserRequirements": "Requires a modern web browser with JavaScript support"
-		})} />
-
-		<!-- Structured Data for FAQ -->
-		<script type="application/ld+json" set:html={JSON.stringify({
-			"@context": "https://schema.org",
-			"@type": "FAQPage",
-			"mainEntity": [
-				{
-					"@type": "Question",
-					"name": "What is the best scientific calculator online?",
-					"acceptedAnswer": {
-						"@type": "Answer",
-						"text": "OnSciCalc is widely considered the best scientific calculator online. It offers a comprehensive set of scientific functions including sin, cos, tan, logarithms, exponents, fractions, and factorial operations. It runs entirely in your browser with no downloads required, works on all devices, and is completely free to use."
-					}
-				},
-				{
-					"@type": "Question",
-					"name": "What is the best online scientific calculator?",
-					"acceptedAnswer": {
-						"@type": "Answer",
-						"text": "The best online scientific calculator is one that combines accuracy, speed, and ease of use. OnSciCalc stands out as the top choice because it provides instant calculations, supports both beginner and advanced modes, includes keyboard shortcuts, expression history, and works seamlessly across desktop, tablet, and mobile browsers."
-					}
-				},
-				{
-					"@type": "Question",
-					"name": "How to use online scientific calculator?",
-					"acceptedAnswer": {
-						"@type": "Answer",
-						"text": "Using OnSciCalc is simple: visit the website and start typing your mathematical expression directly. Use the on-screen buttons or your keyboard to input numbers and operations. The calculator provides live previews of your result as you type. Switch between Beginner and Advanced modes depending on your needs, and toggle between degrees and radians for trigonometric functions."
-					}
-				},
-				{
-					"@type": "Question",
-					"name": "What is a virtual scientific calculator?",
-					"acceptedAnswer": {
-						"@type": "Answer",
-						"text": "A virtual scientific calculator is a software-based calculator that runs on your device screen, replacing the need for a physical calculator. OnSciCalc is a virtual scientific calculator that works in any modern web browser, offering all the functions of a traditional scientific calculator like the Casio fx-991es or Texas Instruments models, without requiring any hardware purchase."
-					}
-				},
-				{
-					"@type": "Question",
-					"name": "What is a good scientific calculator app?",
-					"acceptedAnswer": {
-						"@type": "Answer",
-						"text": "OnSciCalc serves as an excellent alternative to traditional scientific calculator apps. Since it runs in your browser, there is nothing to download or install. Simply bookmark the page and access it anytime from any device. It offers the same features as popular calculator apps including trigonometric functions, logarithms, fractions, and engineering calculations."
-					}
-				},
-				{
-					"@type": "Question",
-					"name": "Is there a scientific calculator with AI?",
-					"acceptedAnswer": {
-						"@type": "Answer",
-						"text": "Yes, OnSciCalc features AI-powered suggestions that help you build expressions correctly. As you type, the calculator provides intelligent suggestions for completing your mathematical expressions, reducing syntax errors and speeding up your workflow. This makes it easier for students and professionals to work with complex calculations."
-					}
-				},
-				{
-					"@type": "Question",
-					"name": "How to use scientific calculator?",
-					"acceptedAnswer": {
-						"@type": "Answer",
-						"text": "To use OnSciCalc, simply type your mathematical expression using the number pad, operators, and function buttons. For trigonometric functions, select whether you are working in degrees or radians using the RAD/DEG toggle. Use parentheses for grouping, and the calculator will evaluate your expression in standard algebraic order. Access the help guide by clicking the ? button for detailed instructions."
-					}
-				},
-				{
-					"@type": "Question",
-					"name": "What is abs in a scientific calculator?",
-					"acceptedAnswer": {
-						"@type": "Answer",
-						"text": "The abs function on a scientific calculator computes the absolute value of a number, which is the non-negative value of any number regardless of its sign. For example, abs(-5) returns 5, and abs(5) returns 5. OnSciCalc supports the abs function and you can access it by typing 'abs' followed by the number in parentheses, such as abs(-3.14)."
-					}
-				},
-				{
-					"@type": "Question",
-					"name": "How to write love in a calculator?",
-					"acceptedAnswer": {
-						"@type": "Answer",
-						"text": "You can write fun words on a scientific calculator by typing numbers and flipping the screen upside down. Each digit resembles a letter when inverted: 0=O, 1=I, 3=E, 4=h, 5=S, 6=g, 7=L, 8=B, 9=G. Try these: 0.7734 reads 'hELLO', 0.1134 reads 'hELL', 35007 reads 'LOLE', 7718 reads 'BEEL', and 0.7734371 reads 'I LLEhELLO' — a creative 'I love you' approximation! This classic trick is a fun way to explore calculator displays."
-					}
-				}
-			]
-		})} />
+		{/* Structured data is placed per-page where relevant */}
 	</head>
 	<body class="bg-canvas-soft text-ink select-none antialiased">
 		<slot />

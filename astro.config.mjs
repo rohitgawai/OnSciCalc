@@ -5,6 +5,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://onscicalc.com',
+  trailingSlash: 'never',
 
   devToolbar: {
     enabled: false,
