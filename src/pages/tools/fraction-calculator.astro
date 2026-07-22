@@ -1,0 +1,132 @@
+---
+// src/pages/tools/fraction-calculator.astro
+import Layout from '../../layouts/Layout.astro';
+import Calculator from '../../components/Calculator.astro';
+import HelpDrawer from '../../components/HelpDrawer.astro';
+import HistoryPanel from '../../components/HistoryPanel.astro';
+---
+
+<Layout 
+  title="Free Online Fraction Scientific Calculator | OnSciCalc"
+  description="Calculate fractions, mixed numbers, and decimal conversions with ease. Free online scientific calculator with full fraction support, double precision, and instant live evaluation."
+  keywords="fraction calculator, online scientific calculator with fraction, free fraction calculator online, fraction math solver"
+  canonical="https://onscicalc.com/tools/fraction-calculator"
+>
+  <!-- Structured Data: Math Solver -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "MathSolver",
+    "name": "OnSciCalc Fraction Calculator",
+    "url": "https://onscicalc.com/tools/fraction-calculator",
+    "mathSolverType": "FractionCalculator",
+    "potentialAction": {
+      "@type": "SolveMathAction",
+      "target": "https://onscicalc.com/tools/fraction-calculator?expr={math_expression}"
+    }
+  })} />
+
+  <!-- Structured Data: FAQ -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do you calculate fractions on a scientific calculator?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "To calculate fractions on OnSciCalc, use the division operator (÷ or /). For example, input (1÷2) + (3÷4). Parentheses keep numerators and denominators organized according to standard algebraic order."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can OnSciCalc convert fractions to decimals?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, OnSciCalc provides live decimal evaluation as you type your fraction expressions, giving high-precision decimal outputs automatically."
+        }
+      }
+    ]
+  })} />
+
+  <!-- Navigation Bar -->
+  <header class="border-b border-hairline bg-canvas sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 group">
+        <div class="w-6 h-6 rounded bg-ink flex items-center justify-center text-canvas text-xs font-bold font-geist-mono">
+          ∑
+        </div>
+        <span class="font-geist font-semibold text-ink text-sm tracking-tight">OnSciCalc</span>
+      </a>
+
+      <nav class="flex items-center gap-4 text-xs font-geist">
+        <a href="/tools/fraction-calculator" class="text-brand-link font-medium">Fraction Calc</a>
+        <a href="/tools/trigonometry-calculator" class="text-body hover:text-ink transition-colors">Trig Calc</a>
+        <a href="/tools/logarithm-calculator" class="text-body hover:text-ink transition-colors">Log Calc</a>
+        <a href="/guides" class="text-body hover:text-ink transition-colors hidden sm:block">Guides</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="min-h-[calc(100vh-3.5rem)] flex flex-col justify-between p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+    <!-- Hero Header -->
+    <div class="text-center max-w-2xl mx-auto mb-6">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-canvas border border-hairline text-[11px] font-geist text-body mb-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-link"></span>
+        Specialized Tool
+      </div>
+      <h1 class="text-2xl md:text-3xl font-bold font-geist text-ink tracking-tight">
+        Online Fraction Scientific Calculator
+      </h1>
+      <p class="text-xs md:text-sm font-geist text-body mt-2">
+        Perform fraction arithmetic, simplify division expressions, and convert fractions to high-precision decimals instantly.
+      </p>
+    </div>
+
+    <!-- Calculator Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div class="lg:col-span-8 flex justify-center">
+        <Calculator />
+      </div>
+      <div class="lg:col-span-4 space-y-4">
+        <HistoryPanel />
+      </div>
+    </div>
+
+    <!-- Educational Content Section -->
+    <article class="mt-12 bg-canvas border border-hairline rounded-xl p-6 md:p-8 max-w-4xl mx-auto space-y-6 text-sm font-geist text-body leading-relaxed">
+      <h2 class="text-xl font-bold text-ink">How to Solve Fractions Using a Scientific Calculator</h2>
+      <p>
+        Working with fractions requires proper evaluation order to avoid common calculation errors. OnSciCalc supports fraction expressions using division notation and parentheses grouping.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-4 my-4">
+        <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+          <h3 class="font-semibold text-ink mb-1">Adding & Subtracting Fractions</h3>
+          <p class="text-xs text-mute">Example: 1/2 + 3/4</p>
+          <code class="block mt-2 font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+            (1 ÷ 2) + (3 ÷ 4) = 1.25
+          </code>
+        </div>
+
+        <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+          <h3 class="font-semibold text-ink mb-1">Multiplying & Dividing Fractions</h3>
+          <p class="text-xs text-mute">Example: (2/3) × (5/8)</p>
+          <code class="block mt-2 font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+            (2 ÷ 3) × (5 ÷ 8) = 0.4166666667
+          </code>
+        </div>
+      </div>
+
+      <h3 class="text-lg font-bold text-ink pt-2">Tips for Fraction Calculations</h3>
+      <ul class="list-disc pl-5 space-y-1 text-xs md:text-sm">
+        <li>Always enclose fractions in parentheses when combining with exponential or trigonometric operations (e.g. <code class="font-geist-mono text-ink">sin(pi ÷ 4)</code>).</li>
+        <li>Use keyboard shortcuts: press <code class="font-geist-mono text-ink">/</code> for division and <code class="font-geist-mono text-ink">(</code> or <code class="font-geist-mono text-ink">)</code> for grouping.</li>
+        <li>Click the <strong>Share</strong> button on the calculator screen to copy the exact fraction link to your clipboard.</li>
+      </ul>
+    </article>
+  </main>
+
+  <HelpDrawer />
+</Layout>

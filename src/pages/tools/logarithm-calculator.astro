@@ -1,0 +1,125 @@
+---
+// src/pages/tools/logarithm-calculator.astro
+import Layout from '../../layouts/Layout.astro';
+import Calculator from '../../components/Calculator.astro';
+import HelpDrawer from '../../components/HelpDrawer.astro';
+import HistoryPanel from '../../components/HistoryPanel.astro';
+---
+
+<Layout 
+  title="Logarithm Calculator Online (Log base 10, Natural Log ln, Exponential eˣ) | OnSciCalc"
+  description="Free online logarithm calculator. Compute common logarithm log₁₀(x), natural logarithm ln(x), exponential eˣ, and powers of 10 instantly."
+  keywords="log calculator, logarithm calculator online, natural log calculator ln, log base 10 calculator, e^x calculator"
+  canonical="https://onscicalc.com/tools/logarithm-calculator"
+>
+  <!-- Structured Data: Math Solver -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "MathSolver",
+    "name": "OnSciCalc Logarithm Calculator",
+    "url": "https://onscicalc.com/tools/logarithm-calculator",
+    "mathSolverType": "LogarithmCalculator",
+    "potentialAction": {
+      "@type": "SolveMathAction",
+      "target": "https://onscicalc.com/tools/logarithm-calculator?expr={math_expression}"
+    }
+  })} />
+
+  <!-- Structured Data: FAQ -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the difference between log and ln on a calculator?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "log(x) calculates the base-10 logarithm (e.g. log(100) = 2), while ln(x) calculates the natural logarithm with base e ≈ 2.71828 (e.g. ln(e) = 1)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How to calculate base e exponentials eˣ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "In Advanced mode, toggle the 2nd button to convert ln to eˣ or type e^(x) directly from your keyboard."
+        }
+      }
+    ]
+  })} />
+
+  <!-- Navigation Bar -->
+  <header class="border-b border-hairline bg-canvas sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 group">
+        <div class="w-6 h-6 rounded bg-ink flex items-center justify-center text-canvas text-xs font-bold font-geist-mono">
+          ∑
+        </div>
+        <span class="font-geist font-semibold text-ink text-sm tracking-tight">OnSciCalc</span>
+      </a>
+
+      <nav class="flex items-center gap-4 text-xs font-geist">
+        <a href="/tools/fraction-calculator" class="text-body hover:text-ink transition-colors">Fraction Calc</a>
+        <a href="/tools/trigonometry-calculator" class="text-body hover:text-ink transition-colors">Trig Calc</a>
+        <a href="/tools/logarithm-calculator" class="text-brand-link font-medium">Log Calc</a>
+        <a href="/guides" class="text-body hover:text-ink transition-colors hidden sm:block">Guides</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="min-h-[calc(100vh-3.5rem)] flex flex-col justify-between p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+    <!-- Hero Header -->
+    <div class="text-center max-w-2xl mx-auto mb-6">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-canvas border border-hairline text-[11px] font-geist text-body mb-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-link"></span>
+        Logarithmic & Exponential Solver
+      </div>
+      <h1 class="text-2xl md:text-3xl font-bold font-geist text-ink tracking-tight">
+        Online Logarithm Calculator
+      </h1>
+      <p class="text-xs md:text-sm font-geist text-body mt-2">
+        Compute common logarithms (log₁₀), natural logarithms (ln), Euler's number e, and powers of 10 with live evaluation.
+      </p>
+    </div>
+
+    <!-- Calculator Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div class="lg:col-span-8 flex justify-center">
+        <Calculator />
+      </div>
+      <div class="lg:col-span-4 space-y-4">
+        <HistoryPanel />
+      </div>
+    </div>
+
+    <!-- Educational Content Section -->
+    <article class="mt-12 bg-canvas border border-hairline rounded-xl p-6 md:p-8 max-w-4xl mx-auto space-y-6 text-sm font-geist text-body leading-relaxed">
+      <h2 class="text-xl font-bold text-ink">Logarithm Rules & Properties</h2>
+      <p>
+        A logarithm answers the question: <em>To what power must we raise the base to get a certain number?</em>
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-4 my-4">
+        <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+          <h3 class="font-semibold text-ink mb-1">Common Logarithm (log)</h3>
+          <p class="text-xs text-mute mb-2">Base 10: 10ʸ = x</p>
+          <code class="block font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+            log(1000) = 3
+          </code>
+        </div>
+
+        <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+          <h3 class="font-semibold text-ink mb-1">Natural Logarithm (ln)</h3>
+          <p class="text-xs text-mute mb-2">Base e (Euler's Number): eʸ = x</p>
+          <code class="block font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+            ln(e^2) = 2
+          </code>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <HelpDrawer />
+</Layout>

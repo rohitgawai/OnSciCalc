@@ -13,7 +13,7 @@ interface Props {
 const { 
   title = "Online Scientific Calculator | OnSciCalc", 
   description = "A free online scientific calculator with full screen mode, double-digit precision, and support for fractions, trigonometry, logarithms, and exponential functions. Works via button click or keyboard.",
-  keywords = "scientific calculator online, scientific calculator online free, online scientific calculator free, scientific calculator amazon, scientific calculator app, online full screen scientific calculator, google scientific calculator, free scientific calculator online full screen scientific calculator, texas instruments scientific calculator online, online scientific calculator, scientific calculator, desmos scientific calculator, free online scientific calculator, best online scientific calculator, online scientific calculator casio, calculator, sin cos tan calculator, scientific calc, online scientific calculator for engineering, online scientific calculator fx-991es, online scientific calculator with fraction, online scientific calculator texas instruments, casio scientific calculator, graphing calculator online, scientific calculator with fractions, free calculator online, math calculator online, engineering calculator online, trig calculator, algebra calculator",
+  keywords = "online scientific calculator, scientific calculator free, fraction calculator, trigonometry calculator, log calculator, engineering calculator",
   canonical = "https://onscicalc.com/",
   ogImage = "https://onscicalc.com/og-image.png",
   robots = "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
@@ -29,13 +29,13 @@ const siteUrl = "https://onscicalc.com";
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<!-- Google tag (gtag.js) -->
+		<!-- Google tag (gtag.js) - Deferred for performance -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-RV6CL7DBF8"></script>
 		<script is:inline>
 			window.dataLayer = window.dataLayer || [];
 			function gtag(){dataLayer.push(arguments);}
 			gtag('js', new Date());
-			gtag('config', 'G-RV6CL7DBF8');
+			gtag('config', 'G-RV6CL7DBF8', { 'send_page_view': true });
 		</script>
 
 		<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
@@ -99,7 +99,14 @@ const siteUrl = "https://onscicalc.com";
 			})();
 		</script>
 
-		{/* Structured data is placed per-page where relevant */}
+		<!-- Service Worker Registration for PWA Offline Caching -->
+		<script is:inline>
+			if ('serviceWorker' in navigator) {
+				window.addEventListener('load', () => {
+					navigator.serviceWorker.register('/sw.js').catch(() => {});
+				});
+			}
+		</script>
 	</head>
 	<body class="bg-canvas-soft text-ink select-none antialiased">
 		<slot />

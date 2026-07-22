@@ -1,0 +1,133 @@
+---
+// src/pages/tools/trigonometry-calculator.astro
+import Layout from '../../layouts/Layout.astro';
+import Calculator from '../../components/Calculator.astro';
+import HelpDrawer from '../../components/HelpDrawer.astro';
+import HistoryPanel from '../../components/HistoryPanel.astro';
+---
+
+<Layout 
+  title="Trigonometry Calculator Online (Sin, Cos, Tan, Deg/Rad) | OnSciCalc"
+  description="Free online trigonometry calculator. Solve sin, cos, tan, inverse trig functions (asin, acos, atan), and switch between degrees and radians instantly."
+  keywords="trigonometry calculator online, sin cos tan calculator, trig calculator degrees radians, inverse trig calculator"
+  canonical="https://onscicalc.com/tools/trigonometry-calculator"
+>
+  <!-- Structured Data: Math Solver -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "MathSolver",
+    "name": "OnSciCalc Trigonometry Calculator",
+    "url": "https://onscicalc.com/tools/trigonometry-calculator",
+    "mathSolverType": "TrigonometryCalculator",
+    "potentialAction": {
+      "@type": "SolveMathAction",
+      "target": "https://onscicalc.com/tools/trigonometry-calculator?expr={math_expression}"
+    }
+  })} />
+
+  <!-- Structured Data: FAQ -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I switch between degrees and radians?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Toggle the DEG / RAD button located in the calculator control bar above the keypad. In DEG mode, angles are evaluated in degrees (e.g. sin(30) = 0.5). In RAD mode, angles are evaluated in radians (e.g. sin(pi/6) = 0.5)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I calculate inverse trig functions (sin⁻¹, cos⁻¹, tan⁻¹)?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Click the 2nd button in Advanced mode to reveal inverse trigonometric functions (sin⁻¹, cos⁻¹, tan⁻¹), or type asin(x), acos(x), atan(x) directly from your keyboard."
+        }
+      }
+    ]
+  })} />
+
+  <!-- Navigation Bar -->
+  <header class="border-b border-hairline bg-canvas sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 group">
+        <div class="w-6 h-6 rounded bg-ink flex items-center justify-center text-canvas text-xs font-bold font-geist-mono">
+          ∑
+        </div>
+        <span class="font-geist font-semibold text-ink text-sm tracking-tight">OnSciCalc</span>
+      </a>
+
+      <nav class="flex items-center gap-4 text-xs font-geist">
+        <a href="/tools/fraction-calculator" class="text-body hover:text-ink transition-colors">Fraction Calc</a>
+        <a href="/tools/trigonometry-calculator" class="text-brand-link font-medium">Trig Calc</a>
+        <a href="/tools/logarithm-calculator" class="text-body hover:text-ink transition-colors">Log Calc</a>
+        <a href="/guides" class="text-body hover:text-ink transition-colors hidden sm:block">Guides</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="min-h-[calc(100vh-3.5rem)] flex flex-col justify-between p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+    <!-- Hero Header -->
+    <div class="text-center max-w-2xl mx-auto mb-6">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-canvas border border-hairline text-[11px] font-geist text-body mb-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-link"></span>
+        Trigonometric Solver
+      </div>
+      <h1 class="text-2xl md:text-3xl font-bold font-geist text-ink tracking-tight">
+        Online Trigonometry Calculator
+      </h1>
+      <p class="text-xs md:text-sm font-geist text-body mt-2">
+        Calculate sine, cosine, tangent, inverse trigonometric functions, and convert between degrees and radians with instant previews.
+      </p>
+    </div>
+
+    <!-- Calculator Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div class="lg:col-span-8 flex justify-center">
+        <Calculator />
+      </div>
+      <div class="lg:col-span-4 space-y-4">
+        <HistoryPanel />
+      </div>
+    </div>
+
+    <!-- Educational Content Section -->
+    <article class="mt-12 bg-canvas border border-hairline rounded-xl p-6 md:p-8 max-w-4xl mx-auto space-y-6 text-sm font-geist text-body leading-relaxed">
+      <h2 class="text-xl font-bold text-ink">Understanding Trigonometry Functions in OnSciCalc</h2>
+      <p>
+        Trigonometry connects side lengths and angles of triangles. OnSciCalc evaluates standard and inverse trigonometric expressions in real time.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-4 my-4">
+        <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+          <h3 class="font-semibold text-ink mb-1">Sine (sin)</h3>
+          <p class="text-xs text-mute mb-2">Opposite / Hypotenuse</p>
+          <code class="block font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+            sin(30°) = 0.5
+          </code>
+        </div>
+
+        <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+          <h3 class="font-semibold text-ink mb-1">Cosine (cos)</h3>
+          <p class="text-xs text-mute mb-2">Adjacent / Hypotenuse</p>
+          <code class="block font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+            cos(60°) = 0.5
+          </code>
+        </div>
+
+        <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+          <h3 class="font-semibold text-ink mb-1">Tangent (tan)</h3>
+          <p class="text-xs text-mute mb-2">Opposite / Adjacent</p>
+          <code class="block font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+            tan(45°) = 1
+          </code>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <HelpDrawer />
+</Layout>

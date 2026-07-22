@@ -7,6 +7,19 @@ import HistoryPanel from '../components/HistoryPanel.astro';
 ---
 
 <Layout>
+  <!-- Structured Data: Math Solver -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "MathSolver",
+    "name": "OnSciCalc Free Online Scientific Calculator & Math Solver",
+    "url": "https://onscicalc.com",
+    "mathSolverType": "ScientificCalculator",
+    "potentialAction": {
+      "@type": "SolveMathAction",
+      "target": "https://onscicalc.com/?expr={math_expression}"
+    }
+  })} />
+
   <!-- Structured Data: Software Application -->
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -121,18 +134,25 @@ import HistoryPanel from '../components/HistoryPanel.astro';
       <div class="absolute -top-[10%] left-[20%] w-[350px] md:w-[600px] h-[350px] md:h-[600px] rounded-full bg-brand-cyan/40 blur-[80px] md:blur-[120px] animate-mesh-1"></div>
       <!-- Blob 2: Violet -->
       <div class="absolute top-[30%] -left-[10%] w-[300px] md:w-[500px] h-[300px] md:h-[500px] rounded-full bg-brand-violet/30 blur-[80px] md:blur-[110px] animate-mesh-2"></div>
-      <!-- Blob 3: Amber/Pink -->
-      <div class="absolute -bottom-[10%] right-[10%] w-[400px] md:w-[700px] h-[400px] md:h-[700px] rounded-full bg-brand-pink/20 blur-[90px] md:blur-[130px] animate-mesh-3"></div>
     </div>
 
     <!-- Header Navigation -->
     <header class="h-14 border-b border-hairline bg-canvas/75 backdrop-blur-md flex items-center justify-between px-4 md:px-6 lg:px-8 z-40 relative">
-      <div class="flex items-center gap-2">
-        <!-- Minimal delta branding logo -->
-        <svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 20h18L12 4z" fill="currentColor" fill-opacity="0.08"></path>
-        </svg>
-        <span class="text-sm font-semibold tracking-tight text-ink font-geist">OnSciCalc<span class="text-brand-link">.</span></span>
+      <div class="flex items-center gap-4">
+        <a href="/" class="flex items-center gap-2">
+          <!-- Minimal delta branding logo -->
+          <svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 20h18L12 4z" fill="currentColor" fill-opacity="0.08"></path>
+          </svg>
+          <span class="text-sm font-semibold tracking-tight text-ink font-geist">OnSciCalc<span class="text-brand-link">.</span></span>
+        </a>
+
+        <!-- Tools Navigation -->
+        <nav class="hidden sm:flex items-center gap-3 text-xs font-geist ml-2">
+          <a href="/tools/fraction-calculator" class="text-body hover:text-ink transition-colors">Fraction Calc</a>
+          <a href="/tools/trigonometry-calculator" class="text-body hover:text-ink transition-colors">Trig Calc</a>
+          <a href="/tools/logarithm-calculator" class="text-body hover:text-ink transition-colors">Log Calc</a>
+        </nav>
       </div>
 
       <!-- Header actions -->
