@@ -1,17 +1,59 @@
-﻿---
+---
+// src/pages/blog/how-to-use-a-scientific-calculator-online.astro
 import StaticPage from '../../layouts/StaticPage.astro';
+import { useTranslations, useTranslatedPath } from '../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const pageUrl = "https://onscicalc.com/blog/how-to-use-a-scientific-calculator-online";
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "@id": `${pageUrl}/#article`,
+  "headline": "How to Use a Scientific Calculator Online — Complete Beginner's Guide",
+  "description": t('guides.desc'),
+  "url": pageUrl,
+  "inLanguage": lang,
+  "datePublished": "2026-07-04T00:00:00Z",
+  "dateModified": "2026-09-01T00:00:00Z",
+  "author": {
+    "@type": "Organization",
+    "@id": "https://onscicalc.com/#organization"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "@id": "https://onscicalc.com/#organization"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": pageUrl
+  },
+  "image": "https://onscicalc.com/og-image.png",
+  "articleSection": "Mathematics & Science"
+};
 ---
 
 <StaticPage
   title="How to Use a Scientific Calculator Online — Complete Beginner's Guide | OnSciCalc"
-  description="Learn how to use a scientific calculator online with this complete beginner's guide. Master trig functions, logarithms, exponents, fractions, and keyboard shortcuts on OnSciCalc."
-  canonical="https://onscicalc.com/blog/how-to-use-a-scientific-calculator-online"
+  description={t('guides.desc')}
+  canonical={pageUrl}
+  ogType="article"
+  publishedTime="2026-07-04T00:00:00Z"
+  modifiedTime="2026-09-01T00:00:00Z"
+  breadcrumbs={[
+    { name: t('nav.blog'), url: '/blog' },
+    { name: "How to Use a Scientific Calculator Online", url: '/blog/how-to-use-a-scientific-calculator-online' }
+  ]}
+  jsonLd={articleSchema}
+  lang={lang}
 >
 
   <article class="prose-custom">
     <h1 class="text-2xl md:text-3xl font-bold text-ink font-geist tracking-tight mb-2">How to Use a Scientific Calculator Online</h1>
     <p class="text-sm text-ink/50 font-geist mb-2">A complete beginner's guide to mastering your online scientific calculator.</p>
-    <p class="text-xs text-ink/40 font-geist mb-8">Published July 2026 · 5 min read</p>
+    <p class="text-xs text-ink/40 font-geist mb-8">{t('blog.published')}</p>
 
     <div class="space-y-8 text-sm leading-relaxed text-ink/70 font-geist">
 
@@ -36,54 +78,29 @@ import StaticPage from '../../layouts/StaticPage.astro';
       </section>
 
       <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">Understanding Operator Precedence</h2>
-        <p>
-          Every scientific calculator follows a standard order of operations. OnSciCalc evaluates expressions in this order:
-        </p>
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('guide.precedence_title')}</h2>
+        <p>{t('guide.precedence_desc')}</p>
         <div class="bg-canvas-soft border border-hairline p-4 rounded-md font-geist-mono text-xs space-y-1 mt-3">
-          <div>1. Parentheses ( )</div>
-          <div>2. Exponents x^y</div>
-          <div>3. Functions sin, cos, tan, log, ln</div>
-          <div>4. Multiplication and Division *, /</div>
-          <div>5. Addition and Subtraction +, -</div>
+          <div>{t('guide.p1')} <span class="text-ink/50">( ... )</span></div>
+          <div>{t('guide.p2')} <span class="text-ink/50">x^y</span></div>
+          <div>{t('guide.p3')} <span class="text-ink/50">sin, cos, tan, log, ln</span></div>
+          <div>{t('guide.p4')} <span class="text-ink/50">*, /</span></div>
+          <div>{t('guide.p5')} <span class="text-ink/50">+, -</span></div>
         </div>
-        <p class="mt-3">
-          Example: <code class="bg-canvas-soft-2 px-1.5 py-0.5 rounded text-brand-link font-geist-mono text-xs">2 + 3 * 4</code> = 14 (multiplication first), but <code class="bg-canvas-soft-2 px-1.5 py-0.5 rounded text-brand-link font-geist-mono text-xs">(2 + 3) * 4</code> = 20 (parentheses first).
-        </p>
       </section>
 
       <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">Working with Trigonometric Functions</h2>
-        <p>
-          OnSciCalc supports sin, cos, tan and their inverse functions. The calculator also supports implicit multiplication — <code class="bg-canvas-soft-2 px-1.5 py-0.5 rounded text-brand-link font-geist-mono text-xs">3(4+2)</code> = 18.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">Logarithms and Exponents</h2>
-        <p>
-          Use <strong>log</strong> for base-10 logarithms and <strong>ln</strong> for natural logarithms. The ^ operator handles exponents: <code class="bg-canvas-soft-2 px-1.5 py-0.5 rounded text-brand-link font-geist-mono text-xs">2^3</code> = 8.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">Keyboard Shortcuts for Efficiency</h2>
-        <p>
-          Power users can type expressions quickly: digits and operators work as expected, Enter evaluates, Backspace deletes, and Escape clears. Type <strong>Shift+S</strong> for inverse sine, <strong>Shift+C</strong> for inverse cosine, and <strong>Shift+T</strong> for inverse tangent.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">Comparison with Other Scientific Calculators</h2>
-        <p>
-          Unlike physical calculators from Texas Instruments or Casio, OnSciCalc runs entirely in your browser. It's free, requires no batteries, and works across all devices. It offers the same functions as the Desmos scientific calculator and supports features like calculation history, AI suggestions, and theme customization.
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('guide.trig_title')}</h2>
+        <p>{t('guide.trig_desc')}</p>
+        <p class="mt-2 text-xs text-mute font-geist-mono bg-canvas-soft p-2.5 rounded border border-hairline">
+          💡 {t('guide.shift_tip')}
         </p>
       </section>
 
       <section class="border-t border-hairline pt-6">
         <h2 class="text-lg font-semibold text-ink mb-3">Start Calculating Today</h2>
         <p>
-          OnSciCalc is the best free online scientific calculator for students, engineers, and professionals. <a href="/" class="text-brand-link hover:underline">Try it now</a> — no sign-up required.
+          OnSciCalc is the best free online scientific calculator for students, engineers, and professionals. <a href={translatePath('/')} class="text-brand-link hover:underline">Try it now</a> — no sign-up required.
         </p>
       </section>
 

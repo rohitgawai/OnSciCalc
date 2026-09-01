@@ -1,33 +1,106 @@
 ---
+// src/layouts/StaticPage.astro
 import Layout from './Layout.astro';
+import LanguagePicker from '../components/LanguagePicker.astro';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../i18n/utils';
+import type { SupportedLanguage } from '../i18n/ui';
 
 interface Props {
   title: string;
   description: string;
-  canonical: string;
+  canonical?: string;
   robots?: string;
+  ogType?: 'website' | 'article';
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  breadcrumbs?: Array<{ name: string; url?: string }>;
+  jsonLd?: any | any[];
+  lang?: SupportedLanguage;
 }
 
-const { title, description, canonical, robots } = Astro.props;
+const detectedLang = getLangFromUrl(Astro.url);
+const { 
+  title, 
+  description, 
+  canonical, 
+  robots, 
+  ogType = 'website',
+  publishedTime,
+  modifiedTime,
+  author = 'OnSciCalc',
+  breadcrumbs,
+  jsonLd,
+  lang = detectedLang 
+} = Astro.props;
+
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
 const siteUrl = "https://onscicalc.com";
+const homeUrl = lang === 'en' ? siteUrl : `${siteUrl}/${lang}`;
+
+// Build automatic breadcrumb schema if breadcrumbs provided
+const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": t('nav.home'),
+      "item": homeUrl
+    },
+    ...breadcrumbs.map((b, idx) => ({
+      "@type": "ListItem",
+      "position": idx + 2,
+      "name": b.name,
+      ...(b.url ? { "item": b.url.startsWith('http') ? b.url : `${siteUrl}${b.url}` } : {})
+    }))
+  ]
+} : null;
+
+const allJsonLd = [
+  ...(breadcrumbSchema ? [breadcrumbSchema] : []),
+  ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical} robots={robots}>
+<Layout 
+  title={title} 
+  description={description} 
+  canonical={canonical} 
+  robots={robots} 
+  ogType={ogType}
+  publishedTime={publishedTime}
+  modifiedTime={modifiedTime}
+  author={author}
+  jsonLd={allJsonLd}
+  lang={lang}
+>
   <div class="min-h-dvh flex flex-col bg-canvas-soft">
 
     <!-- Header -->
     <header class="h-14 border-b border-hairline bg-canvas/75 backdrop-blur-md flex items-center justify-between px-4 md:px-6 lg:px-8 z-40 relative">
-      <a href="/" class="flex items-center gap-2 no-underline">
+      <a href={translatePath('/')} class="flex items-center gap-2 no-underline">
         <svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 20h18L12 4z" fill="currentColor" fill-opacity="0.08"></path>
         </svg>
         <span class="text-sm font-semibold tracking-tight text-ink font-geist">OnSciCalc<span class="text-brand-link">.</span></span>
       </a>
-      <div class="flex items-center gap-4">
-        <a href="/" class="text-sm text-ink/60 hover:text-ink transition-colors font-geist hidden sm:inline">Home</a>
-        <a href="/about-us" class="text-sm text-ink/60 hover:text-ink transition-colors font-geist hidden sm:inline">About</a>
-        <a href="/contact-us" class="text-sm text-ink/60 hover:text-ink transition-colors font-geist hidden sm:inline">Contact</a>
-        <button id="theme-toggle-btn-static" class="flex items-center justify-center w-8 h-8 rounded-full border border-hairline bg-canvas hover:bg-canvas-soft-2 text-ink shadow-2xs cursor-pointer active:scale-95 transition-transform" title="Toggle Theme">
+
+      <div class="flex items-center gap-3">
+        <nav class="hidden sm:flex items-center gap-4 text-sm font-geist">
+          <a href={translatePath('/')} class="text-ink/60 hover:text-ink transition-colors no-underline">{t('nav.home')}</a>
+          <a href={translatePath('/guides')} class="text-ink/60 hover:text-ink transition-colors no-underline">{t('nav.guides')}</a>
+          <a href={translatePath('/about-us')} class="text-ink/60 hover:text-ink transition-colors no-underline">{t('nav.about')}</a>
+          <a href={translatePath('/contact-us')} class="text-ink/60 hover:text-ink transition-colors no-underline">{t('nav.contact')}</a>
+        </nav>
+
+        <!-- Language Picker Dropdown -->
+        <LanguagePicker variant="header" />
+
+        <!-- Theme Toggle -->
+        <button id="theme-toggle-btn-static" class="flex items-center justify-center w-8 h-8 rounded-full border border-hairline bg-canvas hover:bg-canvas-soft-2 text-ink shadow-2xs cursor-pointer active:scale-95 transition-transform" title={t('nav.toggle_theme')}>
           <svg class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="4"></circle>
             <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
@@ -43,17 +116,20 @@ const siteUrl = "https://onscicalc.com";
     <div class="sm:hidden px-4 py-2 border-b border-hairline bg-canvas/50">
       <details class="group">
         <summary class="cursor-pointer text-sm text-ink/60 hover:text-ink transition-colors font-geist select-none">
-          <span class="group-open:hidden">Menu &#9662;</span>
-          <span class="hidden group-open:inline">Close &#9652;</span>
+          <span class="group-open:hidden">{t('nav.menu')} &#9662;</span>
+          <span class="hidden group-open:inline">{t('nav.close')} &#9652;</span>
         </summary>
         <nav class="flex flex-col gap-1 pt-2 pb-1">
-          <a href="/" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Home</a>
-          <a href="/guides" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Guides</a>
-          <a href="/blog" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Blog</a>
-          <a href="/about-us" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">About Us</a>
-          <a href="/privacy-policy" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Privacy Policy</a>
-          <a href="/terms-and-conditions" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Terms &amp; Conditions</a>
-          <a href="/contact-us" class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">Contact Us</a>
+          <a href={translatePath('/')} class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">{t('nav.home')}</a>
+          <a href={translatePath('/guides')} class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">{t('nav.guides')}</a>
+          <a href={translatePath('/blog')} class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">{t('nav.blog')}</a>
+          <a href={translatePath('/tools/fraction-calculator')} class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">{t('nav.fraction_calc')}</a>
+          <a href={translatePath('/tools/trigonometry-calculator')} class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">{t('nav.trig_calc')}</a>
+          <a href={translatePath('/tools/logarithm-calculator')} class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">{t('nav.log_calc')}</a>
+          <a href={translatePath('/about-us')} class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">{t('nav.about')}</a>
+          <a href={translatePath('/privacy-policy')} class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">{t('nav.privacy')}</a>
+          <a href={translatePath('/terms-and-conditions')} class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">{t('nav.terms')}</a>
+          <a href={translatePath('/contact-us')} class="text-sm text-ink/70 hover:text-ink transition-colors font-geist py-1.5 no-underline">{t('nav.contact')}</a>
         </nav>
       </details>
     </div>
@@ -69,48 +145,51 @@ const siteUrl = "https://onscicalc.com";
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           <!-- Brand -->
           <div class="col-span-2 md:col-span-1">
-            <a href="/" class="flex items-center gap-2 no-underline mb-3">
+            <a href={translatePath('/')} class="flex items-center gap-2 no-underline mb-3">
               <svg class="w-4 h-4 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 20h18L12 4z" fill="currentColor" fill-opacity="0.08"></path>
               </svg>
               <span class="text-sm font-semibold tracking-tight text-ink font-geist">OnSciCalc<span class="text-brand-link">.</span></span>
             </a>
-            <p class="text-xs text-ink/50 leading-relaxed">Free online scientific calculator for students, engineers, and professionals.</p>
+            <p class="text-xs text-ink/50 leading-relaxed mb-4">{t('brand.tagline')}</p>
+            
+            <!-- Language selector in footer -->
+            <LanguagePicker variant="footer" />
           </div>
 
           <!-- Quick Links -->
           <div>
-            <h4 class="text-xs font-semibold text-ink/70 uppercase tracking-wider mb-3 font-geist">Quick Links</h4>
+            <h4 class="text-xs font-semibold text-ink/70 uppercase tracking-wider mb-3 font-geist">{t('nav.quick_links')}</h4>
             <ul class="space-y-2">
-              <li><a href="/" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Calculator</a></li>
-              <li><a href="/guides" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Guides</a></li>
-              <li><a href="/blog" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Blog</a></li>
-              <li><a href="/about-us" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">About Us</a></li>
-              <li><a href="/contact-us" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Contact Us</a></li>
+              <li><a href={translatePath('/')} class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">{t('nav.calculator')}</a></li>
+              <li><a href={translatePath('/guides')} class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">{t('nav.guides')}</a></li>
+              <li><a href={translatePath('/blog')} class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">{t('nav.blog')}</a></li>
+              <li><a href={translatePath('/about-us')} class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">{t('nav.about')}</a></li>
+              <li><a href={translatePath('/contact-us')} class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">{t('nav.contact')}</a></li>
             </ul>
           </div>
 
           <!-- Legal -->
           <div>
-            <h4 class="text-xs font-semibold text-ink/70 uppercase tracking-wider mb-3 font-geist">Legal</h4>
+            <h4 class="text-xs font-semibold text-ink/70 uppercase tracking-wider mb-3 font-geist">{t('nav.legal')}</h4>
             <ul class="space-y-2">
-              <li><a href="/privacy-policy" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Privacy Policy</a></li>
-              <li><a href="/terms-and-conditions" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Terms &amp; Conditions</a></li>
+              <li><a href={translatePath('/privacy-policy')} class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">{t('nav.privacy')}</a></li>
+              <li><a href={translatePath('/terms-and-conditions')} class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">{t('nav.terms')}</a></li>
             </ul>
           </div>
 
           <!-- Connect -->
           <div>
-            <h4 class="text-xs font-semibold text-ink/70 uppercase tracking-wider mb-3 font-geist">Connect</h4>
+            <h4 class="text-xs font-semibold text-ink/70 uppercase tracking-wider mb-3 font-geist">{t('nav.connect')}</h4>
             <ul class="space-y-2">
-              <li><a href="mailto:contact@onscicalc.com" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">Email Us</a></li>
+              <li><a href="mailto:contact@onscicalc.com" class="text-sm text-ink/50 hover:text-ink transition-colors no-underline">{t('nav.email_us')}</a></li>
             </ul>
           </div>
         </div>
 
         <div class="mt-8 pt-6 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p class="text-xs text-ink/40 font-geist">&copy; {new Date().getFullYear()} OnSciCalc. All rights reserved.</p>
-          <p class="text-xs text-ink/40 font-geist">Made with precision.</p>
+          <p class="text-xs text-ink/40 font-geist">&copy; {new Date().getFullYear()} OnSciCalc. {t('brand.all_rights')}</p>
+          <p class="text-xs text-ink/40 font-geist">{t('brand.made_with')}</p>
         </div>
       </div>
     </footer>

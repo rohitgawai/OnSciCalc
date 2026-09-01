@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import { getLangFromUrl, getAlternateHreflangLinks, isRtlLang, getOgLocale } from '../i18n/utils';
+import { ogLocales, type SupportedLanguage } from '../i18n/ui';
 
 interface Props {
   title?: string;
@@ -7,27 +9,95 @@ interface Props {
   keywords?: string;
   canonical?: string;
   ogImage?: string;
+  ogType?: 'website' | 'article';
+  author?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
   robots?: string;
+  lang?: SupportedLanguage;
+  jsonLd?: any | any[];
 }
 
+const detectedLang = getLangFromUrl(Astro.url);
 const { 
+  lang = detectedLang,
   title = "Online Scientific Calculator | OnSciCalc", 
   description = "A free online scientific calculator with full screen mode, double-digit precision, and support for fractions, trigonometry, logarithms, and exponential functions. Works via button click or keyboard.",
   keywords = "online scientific calculator, scientific calculator free, fraction calculator, trigonometry calculator, log calculator, engineering calculator",
-  canonical = "https://onscicalc.com/",
+  canonical,
   ogImage = "https://onscicalc.com/og-image.png",
-  robots = "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+  ogType = "website",
+  author = "OnSciCalc",
+  publishedTime,
+  modifiedTime,
+  robots = "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+  jsonLd
 } = Astro.props;
 
 const siteName = "OnSciCalc";
 const siteUrl = "https://onscicalc.com";
+const isRtl = isRtlLang(lang);
+const currentCanonical = canonical || `${siteUrl}${Astro.url.pathname === '/' ? '/' : Astro.url.pathname.replace(/\/$/, '')}`;
+const alternateLinks = getAlternateHreflangLinks(Astro.url.pathname, siteUrl);
+const currentOgLocale = getOgLocale(lang);
+
+// Get all other locales for og:locale:alternate
+const otherOgLocales = Object.values(ogLocales).filter(loc => loc !== currentOgLocale);
+
+// Global Graph Schema (WebSite + Organization)
+const globalGraphSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://onscicalc.com/#website",
+      "url": "https://onscicalc.com/",
+      "name": "OnSciCalc",
+      "alternateName": [
+        "Online Scientific Calculator",
+        "OnSciCalc Scientific Calculator",
+        "Free Online Scientific Calculator"
+      ],
+      "description": "Free online scientific calculator with double-digit precision, fractions, trigonometry, logarithms, and multi-language support.",
+      "inLanguage": Object.keys(ogLocales),
+      "publisher": {
+        "@id": "https://onscicalc.com/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://onscicalc.com/?expr={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://onscicalc.com/#organization",
+      "name": "OnSciCalc",
+      "url": "https://onscicalc.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "@id": "https://onscicalc.com/#logo",
+        "url": "https://onscicalc.com/favicon-96x96.png",
+        "caption": "OnSciCalc Logo"
+      },
+      "image": "https://onscicalc.com/og-image.png",
+      "email": "contact@onscicalc.com"
+    }
+  ]
+};
+
+// Normalize custom jsonLd passed in props
+const extraJsonLdArray = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang} dir={isRtl ? 'rtl' : 'ltr'}>
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
 
 		<!-- Google tag (gtag.js) - Deferred for performance -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-RV6CL7DBF8"></script>
@@ -38,6 +108,7 @@ const siteUrl = "https://onscicalc.com";
 			gtag('config', 'G-RV6CL7DBF8', { 'send_page_view': true });
 		</script>
 
+		<!-- Favicons & Manifest -->
 		<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="shortcut icon" href="/favicon.ico" />
@@ -45,44 +116,75 @@ const siteUrl = "https://onscicalc.com";
 		<link rel="manifest" href="/site.webmanifest" />
 		<meta name="generator" content={Astro.generator} />
 
-		<!-- Primary Meta Tags -->
+		<!-- Primary SEO Meta Tags -->
 		<title>{title}</title>
 		<meta name="title" content={title} />
 		<meta name="description" content={description} />
 		<meta name="keywords" content={keywords} />
-		<meta name="author" content="OnSciCalc" />
+		<meta name="author" content={author} />
+		<meta name="publisher" content="OnSciCalc" />
 		<meta name="robots" content={robots} />
-		<link rel="canonical" href={canonical} />
+		<meta name="googlebot" content={robots} />
+		<meta name="bingbot" content={robots} />
+		<meta name="rating" content="general" />
+		<meta name="revisit-after" content="7 days" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="color-scheme" content="light dark" />
+		<link rel="canonical" href={currentCanonical} />
+
+		<!-- Hreflang Multi-Language Alternate Links for Global SEO -->
+		{alternateLinks.map((alt) => (
+			<link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+		))}
 
 		<!-- Open Graph / Facebook -->
-		<meta property="og:type" content="website" />
-		<meta property="og:url" content={canonical} />
+		<meta property="og:type" content={ogType} />
+		<meta property="og:site_name" content={siteName} />
+		<meta property="og:url" content={currentCanonical} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:secure_url" content={ogImage} />
+		<meta property="og:image:type" content="image/png" />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
-		<meta property="og:image:alt" content="OnSciCalc - Free Online Scientific Calculator" />
-		<meta property="og:site_name" content={siteName} />
-		<meta property="og:locale" content="en_US" />
+		<meta property="og:image:alt" content={title} />
+		<meta property="og:locale" content={currentOgLocale} />
+		{otherOgLocales.map((altLocale) => (
+			<meta property="og:locale:alternate" content={altLocale} />
+		))}
 
-		<!-- Twitter -->
-		<meta property="twitter:card" content="summary_large_image" />
-		<meta property="twitter:url" content={canonical} />
-		<meta property="twitter:title" content={title} />
-		<meta property="twitter:description" content={description} />
-		<meta property="twitter:image" content={ogImage} />
-		<meta property="twitter:image:alt" content="OnSciCalc - Free Online Scientific Calculator" />
+		{ogType === 'article' && publishedTime && (
+			<meta property="article:published_time" content={publishedTime} />
+		)}
+		{ogType === 'article' && modifiedTime && (
+			<meta property="article:modified_time" content={modifiedTime} />
+		)}
+		{ogType === 'article' && (
+			<meta property="article:author" content={author} />
+			<meta property="article:section" content="Mathematics & Science" />
+		)}
 
-		<!-- Additional SEO Meta -->
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:site" content="@onscicalc" />
+		<meta name="twitter:creator" content="@onscicalc" />
+		<meta name="twitter:url" content={currentCanonical} />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
+		<meta name="twitter:image:alt" content={title} />
+
+		<!-- Web Application / Mobile PWA Meta -->
 		<meta name="application-name" content={siteName} />
+		<meta name="apple-mobile-web-app-title" content={siteName} />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-		<meta name="apple-mobile-web-app-title" content={siteName} />
+		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
 		<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
 
-		<!-- Prefetch and load Google Fonts -->
+		<!-- Prefetch & Google Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet" />
@@ -98,6 +200,14 @@ const siteUrl = "https://onscicalc.com";
 				}
 			})();
 		</script>
+
+		<!-- Global Structured Data: WebSite & Organization Graph -->
+		<script type="application/ld+json" set:html={JSON.stringify(globalGraphSchema)} />
+
+		<!-- Page-Specific Injected Structured Data (JSON-LD) -->
+		{extraJsonLdArray.map((schema) => (
+			<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+		))}
 
 		<!-- Service Worker Registration for PWA Offline Caching -->
 		<script is:inline>

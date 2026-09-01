@@ -1,12 +1,19 @@
 ---
-// src/pages/guides.astro
-import StaticPage from '../layouts/StaticPage.astro';
-import { useTranslations, useTranslatedPath } from '../i18n/utils';
+// src/pages/[lang]/guides.astro
+import StaticPage from '../../layouts/StaticPage.astro';
+import { languages, type SupportedLanguage } from '../../i18n/ui';
+import { useTranslations, useTranslatedPath } from '../../i18n/utils';
 
-const lang = 'en';
+export function getStaticPaths() {
+  return (Object.keys(languages) as SupportedLanguage[])
+    .filter((l) => l !== 'en')
+    .map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLanguage };
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
-const pageUrl = "https://onscicalc.com/guides";
+const pageUrl = `https://onscicalc.com/${lang}/guides`;
 
 const guideSchema = {
   "@context": "https://schema.org",
@@ -30,13 +37,7 @@ const guideSchema = {
     "@type": "WebPage",
     "@id": pageUrl
   },
-  "image": "https://onscicalc.com/og-image.png",
-  "about": [
-    { "@type": "Thing", "name": "Scientific Calculator" },
-    { "@type": "Thing", "name": "Trigonometry" },
-    { "@type": "Thing", "name": "Logarithms" },
-    { "@type": "Thing", "name": "Fractions" }
-  ]
+  "image": "https://onscicalc.com/og-image.png"
 };
 ---
 
@@ -47,7 +48,7 @@ const guideSchema = {
   ogType="article"
   publishedTime="2026-07-04T00:00:00Z"
   modifiedTime="2026-09-01T00:00:00Z"
-  breadcrumbs={[{ name: t('nav.guides'), url: '/guides' }]}
+  breadcrumbs={[{ name: t('nav.guides'), url: `/${lang}/guides` }]}
   jsonLd={guideSchema}
   lang={lang}
 >
@@ -57,13 +58,6 @@ const guideSchema = {
     <p class="text-sm text-ink/50 font-geist mb-8">{t('guides.desc')}</p>
 
     <div class="space-y-8 text-sm leading-relaxed text-ink/70 font-geist">
-
-      <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">Getting Started</h2>
-        <p>
-          OnSciCalc is a free online scientific calculator that works entirely in your browser. No downloads, no sign-ups — just open the page and start calculating. Type expressions using your keyboard or click the on-screen buttons. Press <strong>Enter</strong> to evaluate and <strong>Escape</strong> to clear.
-        </p>
-      </section>
 
       <section>
         <h2 class="text-lg font-semibold text-ink mb-3">{t('guide.precedence_title')}</h2>

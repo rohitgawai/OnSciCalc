@@ -1,0 +1,23 @@
+---
+// src/pages/[lang]/tools/[tool].astro
+import ToolPage from '../../../components/ToolPage.astro';
+import { languages, type SupportedLanguage } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  const nonDefaultLangs = (Object.keys(languages) as SupportedLanguage[]).filter((l) => l !== 'en');
+  const tools = ['fraction-calculator', 'trigonometry-calculator', 'logarithm-calculator'] as const;
+
+  return nonDefaultLangs.flatMap((lang) =>
+    tools.map((tool) => ({
+      params: { lang, tool },
+    }))
+  );
+}
+
+const { lang, tool } = Astro.params as { 
+  lang: SupportedLanguage; 
+  tool: 'fraction-calculator' | 'trigonometry-calculator' | 'logarithm-calculator';
+};
+---
+
+<ToolPage tool={tool} lang={lang} />

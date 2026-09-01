@@ -1,16 +1,23 @@
 ---
-// src/pages/guides.astro
-import StaticPage from '../layouts/StaticPage.astro';
-import { useTranslations, useTranslatedPath } from '../i18n/utils';
+// src/pages/[lang]/blog/how-to-use-a-scientific-calculator-online.astro
+import StaticPage from '../../../layouts/StaticPage.astro';
+import { languages, type SupportedLanguage } from '../../../i18n/ui';
+import { useTranslations, useTranslatedPath } from '../../../i18n/utils';
 
-const lang = 'en';
+export function getStaticPaths() {
+  return (Object.keys(languages) as SupportedLanguage[])
+    .filter((l) => l !== 'en')
+    .map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLanguage };
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
-const pageUrl = "https://onscicalc.com/guides";
+const pageUrl = `https://onscicalc.com/${lang}/blog/how-to-use-a-scientific-calculator-online`;
 
-const guideSchema = {
+const articleSchema = {
   "@context": "https://schema.org",
-  "@type": "TechArticle",
+  "@type": "BlogPosting",
   "@id": `${pageUrl}/#article`,
   "headline": t('guides.title'),
   "description": t('guides.desc'),
@@ -31,12 +38,7 @@ const guideSchema = {
     "@id": pageUrl
   },
   "image": "https://onscicalc.com/og-image.png",
-  "about": [
-    { "@type": "Thing", "name": "Scientific Calculator" },
-    { "@type": "Thing", "name": "Trigonometry" },
-    { "@type": "Thing", "name": "Logarithms" },
-    { "@type": "Thing", "name": "Fractions" }
-  ]
+  "articleSection": "Mathematics & Science"
 };
 ---
 
@@ -47,22 +49,24 @@ const guideSchema = {
   ogType="article"
   publishedTime="2026-07-04T00:00:00Z"
   modifiedTime="2026-09-01T00:00:00Z"
-  breadcrumbs={[{ name: t('nav.guides'), url: '/guides' }]}
-  jsonLd={guideSchema}
+  breadcrumbs={[
+    { name: t('nav.blog'), url: `/${lang}/blog` },
+    { name: t('guides.title'), url: `/${lang}/blog/how-to-use-a-scientific-calculator-online` }
+  ]}
+  jsonLd={articleSchema}
   lang={lang}
 >
 
   <article class="prose-custom">
     <h1 class="text-2xl md:text-3xl font-bold text-ink font-geist tracking-tight mb-2">{t('guide.calc_guide')}</h1>
-    <p class="text-sm text-ink/50 font-geist mb-8">{t('guides.desc')}</p>
+    <p class="text-sm text-ink/50 font-geist mb-2">{t('guides.desc')}</p>
+    <p class="text-xs text-ink/40 font-geist mb-8">{t('blog.published')}</p>
 
     <div class="space-y-8 text-sm leading-relaxed text-ink/70 font-geist">
 
       <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">Getting Started</h2>
-        <p>
-          OnSciCalc is a free online scientific calculator that works entirely in your browser. No downloads, no sign-ups — just open the page and start calculating. Type expressions using your keyboard or click the on-screen buttons. Press <strong>Enter</strong> to evaluate and <strong>Escape</strong> to clear.
-        </p>
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('seo.h1')}</h2>
+        <p>{t('seo.p1')}</p>
       </section>
 
       <section>
@@ -80,32 +84,12 @@ const guideSchema = {
       <section>
         <h2 class="text-lg font-semibold text-ink mb-3">{t('guide.trig_title')}</h2>
         <p>{t('guide.trig_desc')}</p>
-        <div class="bg-canvas-soft-2 border border-hairline rounded-md p-3 mt-3 text-xs">
-          <span class="font-semibold text-ink">💡 {t('guide.shift_tip')}</span>
-        </div>
+        <p class="mt-2 text-xs text-mute font-geist-mono bg-canvas-soft p-2.5 rounded border border-hairline">
+          💡 {t('guide.shift_tip')}
+        </p>
       </section>
 
-      <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">{t('guide.exponent_title')}</h2>
-        <p>{t('guide.exponent_desc')}</p>
-      </section>
-
-      <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">{t('guide.log_title')}</h2>
-        <p>{t('guide.log_desc')}</p>
-      </section>
-
-      <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">{t('guide.factorial_title')}</h2>
-        <p>{t('guide.factorial_desc')}</p>
-      </section>
-
-      <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">{t('guide.keyboard_title')}</h2>
-        <p>{t('guide.keyboard_desc')}</p>
-      </section>
-
-      <section class="pt-4 border-t border-hairline">
+      <section class="border-t border-hairline pt-6">
         <p>
           <a href={translatePath('/')} class="text-brand-link font-medium hover:underline">← {t('nav.calculator')}</a>
         </p>

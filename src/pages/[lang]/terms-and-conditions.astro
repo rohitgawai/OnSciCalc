@@ -1,0 +1,71 @@
+---
+// src/pages/[lang]/terms-and-conditions.astro
+import StaticPage from '../../layouts/StaticPage.astro';
+import { languages, type SupportedLanguage } from '../../i18n/ui';
+import { useTranslations, useTranslatedPath } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return (Object.keys(languages) as SupportedLanguage[])
+    .filter((l) => l !== 'en')
+    .map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLanguage };
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const pageUrl = `https://onscicalc.com/${lang}/terms-and-conditions`;
+
+const termsSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${pageUrl}/#webpage`,
+  "url": pageUrl,
+  "name": t('terms.title'),
+  "description": t('terms.desc'),
+  "inLanguage": lang,
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "https://onscicalc.com/#website"
+  }
+};
+---
+
+<StaticPage 
+  title={t('terms.title')}
+  description={t('terms.desc')}
+  canonical={pageUrl}
+  breadcrumbs={[{ name: t('nav.terms'), url: `/${lang}/terms-and-conditions` }]}
+  jsonLd={termsSchema}
+  lang={lang}
+>
+
+  <article class="prose-custom">
+    <h1 class="text-2xl md:text-3xl font-bold text-ink font-geist tracking-tight mb-2">{t('nav.terms')}</h1>
+    <p class="text-sm text-ink/50 font-geist mb-8">{t('brand.tagline')}</p>
+
+    <div class="space-y-6 text-sm leading-relaxed text-ink/70 font-geist">
+
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('about.title')}</h2>
+        <p>
+          By using OnSciCalc (onscicalc.com), you agree to these Terms & Conditions. The service provides a free online scientific calculator running in your web browser.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-3">Service Availability & Accuracy</h2>
+        <p>
+          Calculations are executed locally with double precision. While designed for high accuracy, users should verify critical calculations independently.
+        </p>
+      </section>
+
+      <section class="pt-4 border-t border-hairline">
+        <p>
+          <a href={translatePath('/')} class="text-brand-link font-medium hover:underline">← {t('nav.calculator')}</a>
+        </p>
+      </section>
+
+    </div>
+  </article>
+
+</StaticPage>

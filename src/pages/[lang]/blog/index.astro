@@ -1,12 +1,19 @@
 ---
-// src/pages/blog/index.astro
-import StaticPage from '../../layouts/StaticPage.astro';
-import { useTranslations, useTranslatedPath } from '../../i18n/utils';
+// src/pages/[lang]/blog/index.astro
+import StaticPage from '../../../layouts/StaticPage.astro';
+import { languages, type SupportedLanguage } from '../../../i18n/ui';
+import { useTranslations, useTranslatedPath } from '../../../i18n/utils';
 
-const lang = 'en';
+export function getStaticPaths() {
+  return (Object.keys(languages) as SupportedLanguage[])
+    .filter((l) => l !== 'en')
+    .map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLanguage };
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
-const pageUrl = "https://onscicalc.com/blog";
+const pageUrl = `https://onscicalc.com/${lang}/blog`;
 
 const blogIndexSchema = {
   "@context": "https://schema.org",
@@ -27,7 +34,7 @@ const blogIndexSchema = {
   title={t('blog.title')}
   description={t('blog.desc')}
   canonical={pageUrl}
-  breadcrumbs={[{ name: t('nav.blog'), url: '/blog' }]}
+  breadcrumbs={[{ name: t('nav.blog'), url: `/${lang}/blog` }]}
   jsonLd={blogIndexSchema}
   lang={lang}
 >

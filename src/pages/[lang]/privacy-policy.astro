@@ -1,0 +1,71 @@
+---
+// src/pages/[lang]/privacy-policy.astro
+import StaticPage from '../../layouts/StaticPage.astro';
+import { languages, type SupportedLanguage } from '../../i18n/ui';
+import { useTranslations, useTranslatedPath } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return (Object.keys(languages) as SupportedLanguage[])
+    .filter((l) => l !== 'en')
+    .map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLanguage };
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const pageUrl = `https://onscicalc.com/${lang}/privacy-policy`;
+
+const privacySchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${pageUrl}/#webpage`,
+  "url": pageUrl,
+  "name": t('privacy.title'),
+  "description": t('privacy.desc'),
+  "inLanguage": lang,
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "https://onscicalc.com/#website"
+  }
+};
+---
+
+<StaticPage 
+  title={t('privacy.title')}
+  description={t('privacy.desc')}
+  canonical={pageUrl}
+  breadcrumbs={[{ name: t('nav.privacy'), url: `/${lang}/privacy-policy` }]}
+  jsonLd={privacySchema}
+  lang={lang}
+>
+
+  <article class="prose-custom">
+    <h1 class="text-2xl md:text-3xl font-bold text-ink font-geist tracking-tight mb-2">{t('nav.privacy')}</h1>
+    <p class="text-sm text-ink/50 font-geist mb-8">{t('brand.tagline')}</p>
+
+    <div class="space-y-6 text-sm leading-relaxed text-ink/70 font-geist">
+
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('about.title')}</h2>
+        <p>
+          OnSciCalc ("onscicalc.com") is committed to protecting your privacy. Calculations performed in our online scientific calculator happen directly inside your web browser locally. No mathematical computations, formulas, or expressions are stored on our servers.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-3">LocalStorage & Data Privacy</h2>
+        <p>
+          Your calculator history and theme preferences are saved in your browser's local storage. You can clear this data at any time directly through the calculation history panel or your browser settings.
+        </p>
+      </section>
+
+      <section class="pt-4 border-t border-hairline">
+        <p>
+          <a href={translatePath('/')} class="text-brand-link font-medium hover:underline">← {t('nav.calculator')}</a>
+        </p>
+      </section>
+
+    </div>
+  </article>
+
+</StaticPage>

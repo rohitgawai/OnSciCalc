@@ -1,12 +1,19 @@
 ---
-// src/pages/contact-us.astro
-import StaticPage from '../layouts/StaticPage.astro';
-import { useTranslations, useTranslatedPath } from '../i18n/utils';
+// src/pages/[lang]/contact-us.astro
+import StaticPage from '../../layouts/StaticPage.astro';
+import { languages, type SupportedLanguage } from '../../i18n/ui';
+import { useTranslations, useTranslatedPath } from '../../i18n/utils';
 
-const lang = 'en';
+export function getStaticPaths() {
+  return (Object.keys(languages) as SupportedLanguage[])
+    .filter((l) => l !== 'en')
+    .map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLanguage };
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
-const pageUrl = "https://onscicalc.com/contact-us";
+const pageUrl = `https://onscicalc.com/${lang}/contact-us`;
 
 const contactPageSchema = {
   "@context": "https://schema.org",
@@ -32,22 +39,16 @@ const contactPageSchema = {
   title={t('contact.title')}
   description={t('contact.desc')}
   canonical={pageUrl}
-  breadcrumbs={[{ name: t('nav.contact'), url: '/contact-us' }]}
+  breadcrumbs={[{ name: t('nav.contact'), url: `/${lang}/contact-us` }]}
   jsonLd={contactPageSchema}
   lang={lang}
 >
 
   <article class="prose-custom">
     <h1 class="text-2xl md:text-3xl font-bold text-ink font-geist tracking-tight mb-2">{t('nav.contact')}</h1>
-    <p class="text-sm text-ink/50 font-geist mb-8">We'd love to hear from you.</p>
+    <p class="text-sm text-ink/50 font-geist mb-8">{t('brand.tagline')}</p>
 
     <div class="space-y-8 text-sm leading-relaxed text-ink/70 font-geist">
-
-      <section>
-        <p>
-          Whether you have a question about OnSciCalc, need help with a feature, found a bug, or want to share feedback, we're here to help. Choose the method that works best for you.
-        </p>
-      </section>
 
       <!-- Contact Methods -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -61,8 +62,8 @@ const contactPageSchema = {
               </svg>
             </div>
             <div>
-              <h3 class="text-base font-semibold text-ink">Email</h3>
-              <p class="text-xs text-ink/50">We reply within 24-48 hours</p>
+              <h3 class="text-base font-semibold text-ink">{t('nav.email_us')}</h3>
+              <p class="text-xs text-ink/50">contact@onscicalc.com</p>
             </div>
           </div>
           <a href="mailto:contact@onscicalc.com" class="text-brand-link hover:underline text-sm no-underline">
@@ -70,7 +71,7 @@ const contactPageSchema = {
           </a>
         </div>
 
-        <!-- Website -->
+        <!-- Calculator Link -->
         <div class="border border-hairline rounded-xl p-5 bg-canvas hover:bg-canvas-soft transition-colors">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 rounded-lg bg-brand-violet/10 flex items-center justify-center">
@@ -81,8 +82,8 @@ const contactPageSchema = {
               </svg>
             </div>
             <div>
-              <h3 class="text-base font-semibold text-ink">Website</h3>
-              <p class="text-xs text-ink/50">Visit our calculator</p>
+              <h3 class="text-base font-semibold text-ink">{t('nav.calculator')}</h3>
+              <p class="text-xs text-ink/50">OnSciCalc</p>
             </div>
           </div>
           <a href={translatePath('/')} class="text-brand-link hover:underline text-sm no-underline">
@@ -91,19 +92,9 @@ const contactPageSchema = {
         </div>
       </div>
 
-      <!-- Response Time -->
-      <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">Response Times</h2>
+      <section class="pt-4 border-t border-hairline">
         <p>
-          We aim to respond to all inquiries within <strong>24 to 48 business hours</strong>. For bug reports, including reproduction steps and browser information helps us investigate and fix issues more quickly.
-        </p>
-      </section>
-
-      <!-- Feedback -->
-      <section>
-        <h2 class="text-lg font-semibold text-ink mb-3">Your Feedback Matters</h2>
-        <p>
-          OnSciCalc is actively developed and improved based on user feedback. If you have an idea that would make the calculator better for your use case, we want to know about it.
+          <a href={translatePath('/')} class="text-brand-link font-medium hover:underline">← {t('nav.calculator')}</a>
         </p>
       </section>
 

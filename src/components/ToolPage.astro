@@ -1,0 +1,259 @@
+---
+// src/components/ToolPage.astro
+import Layout from '../layouts/Layout.astro';
+import Calculator from './Calculator.astro';
+import HelpDrawer from './HelpDrawer.astro';
+import HistoryPanel from './HistoryPanel.astro';
+import LanguagePicker from './LanguagePicker.astro';
+import { useTranslations, useTranslatedPath } from '../i18n/utils';
+import type { SupportedLanguage } from '../i18n/ui';
+
+interface Props {
+  tool: 'fraction-calculator' | 'trigonometry-calculator' | 'logarithm-calculator';
+  lang?: SupportedLanguage;
+}
+
+const { tool, lang = 'en' } = Astro.props;
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const siteUrl = "https://onscicalc.com";
+const toolBasePath = `/tools/${tool}`;
+const canonicalUrl = lang === 'en' ? `${siteUrl}${toolBasePath}` : `${siteUrl}/${lang}${toolBasePath}`;
+
+let pageTitle = '';
+let pageDesc = '';
+let pageKeywords = '';
+let heading1 = '';
+let subtitle = '';
+let mathSolverType = '';
+
+if (tool === 'fraction-calculator') {
+  pageTitle = t('tool.fraction_title');
+  pageDesc = t('tool.fraction_desc');
+  pageKeywords = t('tool.fraction_keywords');
+  heading1 = t('tool.fraction_h1');
+  subtitle = t('tool.fraction_subtitle');
+  mathSolverType = 'FractionCalculator';
+} else if (tool === 'trigonometry-calculator') {
+  pageTitle = t('tool.trig_title');
+  pageDesc = t('tool.trig_desc');
+  pageKeywords = t('tool.trig_keywords');
+  heading1 = t('tool.trig_h1');
+  subtitle = t('tool.trig_subtitle');
+  mathSolverType = 'TrigonometryCalculator';
+} else if (tool === 'logarithm-calculator') {
+  pageTitle = t('tool.log_title');
+  pageDesc = t('tool.log_desc');
+  pageKeywords = t('tool.log_keywords');
+  heading1 = t('tool.log_h1');
+  subtitle = t('tool.log_subtitle');
+  mathSolverType = 'LogarithmCalculator';
+}
+---
+
+<Layout 
+  title={pageTitle} 
+  description={pageDesc} 
+  keywords={pageKeywords} 
+  canonical={canonicalUrl}
+  lang={lang}
+>
+  <!-- Structured Data: Math Solver -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "MathSolver",
+    "@id": `${canonicalUrl}/#mathsolver`,
+    "name": `${t('brand.name')} ${heading1}`,
+    "url": canonicalUrl,
+    "description": pageDesc,
+    "mathSolverType": mathSolverType,
+    "potentialAction": {
+      "@type": "SolveMathAction",
+      "target": `${canonicalUrl}?expr={math_expression}`
+    }
+  })} />
+
+  <!-- Structured Data: WebApplication -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "@id": `${canonicalUrl}/#app`,
+    "name": `${t('brand.name')} - ${heading1}`,
+    "url": canonicalUrl,
+    "description": pageDesc,
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All",
+    "inLanguage": lang,
+    "image": "https://onscicalc.com/og-image.png",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock"
+    },
+    "browserRequirements": "Requires a modern web browser with JavaScript support"
+  })} />
+
+  <!-- Structured Data: Breadcrumbs -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": t('nav.home'),
+        "item": lang === 'en' ? siteUrl : `${siteUrl}/${lang}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": heading1,
+        "item": canonicalUrl
+      }
+    ]
+  })} />
+
+  <!-- Navigation Bar -->
+  <header class="border-b border-hairline bg-canvas/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <a href={translatePath('/')} class="flex items-center gap-2 group no-underline">
+        <div class="w-6 h-6 rounded bg-ink flex items-center justify-center text-canvas text-xs font-bold font-geist-mono">
+          ∑
+        </div>
+        <span class="font-geist font-semibold text-ink text-sm tracking-tight">OnSciCalc<span class="text-brand-link">.</span></span>
+      </a>
+
+      <div class="flex items-center gap-4">
+        <nav class="hidden sm:flex items-center gap-4 text-xs font-geist">
+          <a 
+            href={translatePath('/tools/fraction-calculator')} 
+            class={`no-underline transition-colors ${tool === 'fraction-calculator' ? 'text-brand-link font-medium' : 'text-body hover:text-ink'}`}
+          >
+            {t('nav.fraction_calc')}
+          </a>
+          <a 
+            href={translatePath('/tools/trigonometry-calculator')} 
+            class={`no-underline transition-colors ${tool === 'trigonometry-calculator' ? 'text-brand-link font-medium' : 'text-body hover:text-ink'}`}
+          >
+            {t('nav.trig_calc')}
+          </a>
+          <a 
+            href={translatePath('/tools/logarithm-calculator')} 
+            class={`no-underline transition-colors ${tool === 'logarithm-calculator' ? 'text-brand-link font-medium' : 'text-body hover:text-ink'}`}
+          >
+            {t('nav.log_calc')}
+          </a>
+          <a href={translatePath('/guides')} class="text-body hover:text-ink transition-colors no-underline">
+            {t('nav.guides')}
+          </a>
+        </nav>
+
+        <!-- Language Picker -->
+        <LanguagePicker variant="header" />
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="min-h-[calc(100vh-3.5rem)] flex flex-col justify-between p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+    <!-- Hero Header -->
+    <div class="text-center max-w-2xl mx-auto mb-6">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-canvas border border-hairline text-[11px] font-geist text-body mb-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-link"></span>
+        {t('brand.name')} Tool
+      </div>
+      <h1 class="text-2xl md:text-3xl font-bold font-geist text-ink tracking-tight">
+        {heading1}
+      </h1>
+      <p class="text-xs md:text-sm font-geist text-body mt-2">
+        {subtitle}
+      </p>
+    </div>
+
+    <!-- Calculator Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div class="lg:col-span-8 flex justify-center">
+        <Calculator lang={lang} />
+      </div>
+      <div class="lg:col-span-4 space-y-4">
+        <HistoryPanel lang={lang} />
+      </div>
+    </div>
+
+    <!-- Educational Content Section -->
+    <article class="mt-12 bg-canvas border border-hairline rounded-xl p-6 md:p-8 max-w-4xl mx-auto space-y-6 text-sm font-geist text-body leading-relaxed">
+      {tool === 'fraction-calculator' && (
+        <div>
+          <h2 class="text-xl font-bold text-ink mb-3">{heading1}</h2>
+          <p>{subtitle}</p>
+          <div class="grid md:grid-cols-2 gap-4 my-4">
+            <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+              <h3 class="font-semibold text-ink mb-1">Addition & Subtraction</h3>
+              <p class="text-xs text-mute">Example: 1/2 + 3/4</p>
+              <code class="block mt-2 font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+                (1 ÷ 2) + (3 ÷ 4) = 1.25
+              </code>
+            </div>
+            <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+              <h3 class="font-semibold text-ink mb-1">Multiplication & Division</h3>
+              <p class="text-xs text-mute">Example: (2/3) × (5/8)</p>
+              <code class="block mt-2 font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+                (2 ÷ 3) × (5 ÷ 8) = 0.4166666667
+              </code>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tool === 'trigonometry-calculator' && (
+        <div>
+          <h2 class="text-xl font-bold text-ink mb-3">{heading1}</h2>
+          <p>{subtitle}</p>
+          <div class="grid md:grid-cols-2 gap-4 my-4">
+            <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+              <h3 class="font-semibold text-ink mb-1">DEG Mode</h3>
+              <p class="text-xs text-mute">Angles in degrees</p>
+              <code class="block mt-2 font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+                sin(30) = 0.5, cos(60) = 0.5
+              </code>
+            </div>
+            <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+              <h3 class="font-semibold text-ink mb-1">RAD Mode</h3>
+              <p class="text-xs text-mute">Angles in radians</p>
+              <code class="block mt-2 font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+                sin(pi ÷ 2) = 1, cos(pi) = -1
+              </code>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tool === 'logarithm-calculator' && (
+        <div>
+          <h2 class="text-xl font-bold text-ink mb-3">{heading1}</h2>
+          <p>{subtitle}</p>
+          <div class="grid md:grid-cols-2 gap-4 my-4">
+            <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+              <h3 class="font-semibold text-ink mb-1">Log base 10 (log)</h3>
+              <p class="text-xs text-mute">Common logarithm</p>
+              <code class="block mt-2 font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+                log(100) = 2, log(1000) = 3
+              </code>
+            </div>
+            <div class="bg-canvas-soft border border-hairline p-4 rounded-lg">
+              <h3 class="font-semibold text-ink mb-1">Natural Log (ln)</h3>
+              <p class="text-xs text-mute">Base e logarithm</p>
+              <code class="block mt-2 font-geist-mono text-xs text-brand-link bg-canvas p-2 rounded border border-hairline">
+                ln(e) = 1, ln(1) = 0
+              </code>
+            </div>
+          </div>
+        </div>
+      )}
+    </article>
+  </main>
+
+  <HelpDrawer lang={lang} />
+</Layout>

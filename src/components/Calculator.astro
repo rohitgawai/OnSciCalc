@@ -1,19 +1,36 @@
 ---
 // src/components/Calculator.astro
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import type { SupportedLanguage } from '../i18n/ui';
+
+interface Props {
+  lang?: SupportedLanguage;
+}
+
+const detectedLang = getLangFromUrl(Astro.url);
+const { lang = detectedLang } = Astro.props;
+const t = useTranslations(lang);
 ---
 
-<div class="w-full max-w-[540px] bg-canvas border border-hairline rounded-xl shadow-lg overflow-hidden flex flex-col h-full lg:h-auto">
+<div 
+  id="calculator-root" 
+  class="w-full max-w-[540px] bg-canvas border border-hairline rounded-xl shadow-lg overflow-hidden flex flex-col h-full lg:h-auto"
+  data-txt-beginner={t('calc.beginner')}
+  data-txt-advanced={t('calc.advanced')}
+  data-txt-ready={t('calc.ready')}
+  data-txt-copied={t('calc.copied')}
+>
   <!-- Calculator Display Screen -->
   <div class="bg-canvas-soft-2 p-5 border-b border-hairline flex flex-col gap-2 relative">
     <!-- Mode status line -->
     <div class="flex justify-between items-center text-[10px] font-geist-mono uppercase tracking-wider text-mute">
       <div class="flex gap-3">
         <span id="indicator-angle" class="font-bold text-brand-link">RAD</span>
-        <span id="indicator-mode" class="font-bold">Advanced</span>
+        <span id="indicator-mode" class="font-bold">{t('calc.advanced')}</span>
       </div>
       <div id="indicator-status" class="flex items-center gap-1.5 text-brand-success">
         <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
-        Ready
+        {t('calc.ready')}
       </div>
     </div>
 
@@ -37,9 +54,9 @@
 
   <!-- AI / Contextual Suggestion Strip -->
   <div class="bg-canvas border-b border-hairline px-4 py-2 flex items-center gap-2 min-h-[44px]">
-    <span class="text-[10px] font-geist-mono uppercase text-mute whitespace-nowrap">AI Suggestions:</span>
-    <div id="suggestions-container" class="flex gap-2 overflow-x-auto no-scrollbar w-full py-0.5 scroll-smooth">
-      <span class="text-xs text-mute font-geist-mono italic">Start typing to see suggestions...</span>
+    <span class="text-[10px] font-geist-mono uppercase text-mute whitespace-nowrap">{t('calc.suggestions_label')}</span>
+    <div id="suggestions-container" class="flex gap-2 overflow-x-auto no-scrollbar w-full py-0.5 scroll-smooth" data-placeholder={t('calc.suggestions_placeholder')}>
+      <span class="text-xs text-mute font-geist-mono italic">{t('calc.suggestions_placeholder')}</span>
     </div>
   </div>
 
@@ -47,29 +64,29 @@
   <div class="flex items-center justify-between border-b border-hairline px-5 py-2 bg-canvas-soft">
     <!-- Mode selector pill -->
     <div class="bg-canvas border border-hairline rounded-full p-0.5 flex">
-      <button id="btn-mode-beginner" class="px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs">Beginner</button>
-      <button id="btn-mode-advanced" class="px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink">Advanced</button>
+      <button id="btn-mode-beginner" class="px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs">{t('calc.beginner')}</button>
+      <button id="btn-mode-advanced" class="px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink">{t('calc.advanced')}</button>
     </div>
 
     <!-- Trig Angle, Second toggles & Share calculation -->
     <div class="flex gap-2 items-center">
       <!-- Share calculation link button -->
-      <button id="btn-share-calc" title="Share calculation URL" class="px-2.5 py-0.5 text-[10px] font-bold rounded-full border border-hairline bg-canvas text-body hover:text-ink hover:bg-canvas-soft transition-all duration-150 flex items-center gap-1 cursor-pointer">
+      <button id="btn-share-calc" title={t('calc.share_title')} class="px-2.5 py-0.5 text-[10px] font-bold rounded-full border border-hairline bg-canvas text-body hover:text-ink hover:bg-canvas-soft transition-all duration-150 flex items-center gap-1 cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 100-5.367 3 3 0 000 5.367zm0 8.484a3 3 0 100-5.367 3 3 0 000 5.367z" />
         </svg>
-        <span>Share</span>
+        <span>{t('calc.share')}</span>
       </button>
 
       <!-- 2nd Shift selector pill -->
       <div id="second-toggle-container" class="bg-canvas border border-hairline rounded-full p-0.5 flex hidden">
-        <button id="btn-second" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink">2nd</button>
+        <button id="btn-second" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink">{t('calc.2nd')}</button>
       </div>
 
       <!-- Trig Angle selector pill -->
       <div id="angle-toggle-container" class="bg-canvas border border-hairline rounded-full p-0.5 flex">
-        <button id="btn-angle-deg" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink">DEG</button>
-        <button id="btn-angle-rad" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs">RAD</button>
+        <button id="btn-angle-deg" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 text-body hover:text-ink">{t('calc.deg')}</button>
+        <button id="btn-angle-rad" class="px-3 py-0.5 text-[10px] font-bold rounded-full cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs">{t('calc.rad')}</button>
       </div>
     </div>
   </div>
@@ -79,7 +96,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
     </svg>
-    <span id="share-toast-msg">Link copied to clipboard!</span>
+    <span id="share-toast-msg">{t('calc.copied')}</span>
   </div>
 
   <!-- Keyboard grids container -->
@@ -756,20 +773,24 @@
   // 7. updateLayoutUI (no dependencies)
   function updateLayoutUI() {
     const secondToggleContainer = document.getElementById('second-toggle-container');
+    const rootEl = document.getElementById('calculator-root');
+    const txtBeg = rootEl?.getAttribute('data-txt-beginner') || 'Beginner';
+    const txtAdv = rootEl?.getAttribute('data-txt-advanced') || 'Advanced';
+
     if (state.layoutMode === 'BEGINNER') {
       keypadBeg.classList.remove('hidden');
       keypadAdv.classList.add('hidden');
       if (secondToggleContainer) secondToggleContainer.classList.add('hidden');
       btnBeg.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
       btnAdv.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink";
-      elModeIndicator.textContent = "Beginner";
+      elModeIndicator.textContent = txtBeg;
     } else {
       keypadBeg.classList.add('hidden');
       keypadAdv.classList.remove('hidden');
       if (secondToggleContainer) secondToggleContainer.classList.remove('hidden');
       btnBeg.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 text-body hover:text-ink";
       btnAdv.className = "px-3 py-1 text-xs rounded-full font-medium cursor-pointer transition-all duration-150 bg-ink text-canvas shadow-xs";
-      elModeIndicator.textContent = "Advanced";
+      elModeIndicator.textContent = txtAdv;
     }
     state.secondActive = false;
     updateSecondUI();

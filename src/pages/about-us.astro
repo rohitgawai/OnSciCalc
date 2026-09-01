@@ -1,15 +1,43 @@
 ---
+// src/pages/about-us.astro
 import StaticPage from '../layouts/StaticPage.astro';
+import { useTranslations, useTranslatedPath } from '../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const pageUrl = "https://onscicalc.com/about-us";
+
+const aboutPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "@id": `${pageUrl}/#webpage`,
+  "url": pageUrl,
+  "name": t('about.title'),
+  "description": t('about.desc'),
+  "inLanguage": lang,
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "https://onscicalc.com/#website"
+  },
+  "mainEntity": {
+    "@type": "Organization",
+    "@id": "https://onscicalc.com/#organization"
+  }
+};
 ---
 
 <StaticPage 
-  title="About Us - OnSciCalc"
-  description="Learn about OnSciCalc, the best free online scientific calculator for students, engineers, and professionals. Discover our mission to make math accessible."
-  canonical="https://onscicalc.com/about-us"
+  title={t('about.title')}
+  description={t('about.desc')}
+  canonical={pageUrl}
+  breadcrumbs={[{ name: t('nav.about'), url: '/about-us' }]}
+  jsonLd={aboutPageSchema}
+  lang={lang}
 >
 
   <article class="prose-custom">
-    <h1 class="text-2xl md:text-3xl font-bold text-ink font-geist tracking-tight mb-2">About Us</h1>
+    <h1 class="text-2xl md:text-3xl font-bold text-ink font-geist tracking-tight mb-2">{t('nav.about')}</h1>
     <p class="text-sm text-ink/50 font-geist mb-8">Making mathematics accessible for everyone.</p>
 
     <div class="space-y-6 text-sm leading-relaxed text-ink/70 font-geist">
@@ -66,14 +94,14 @@ import StaticPage from '../layouts/StaticPage.astro';
           We are committed to keeping OnSciCalc free, ad-free (or minimally monetized), and continuously improving. We welcome feedback from our users and actively incorporate feature requests and bug reports into our development roadmap.
         </p>
         <p>
-          If you have suggestions, found a bug, or just want to say hello, don't hesitate to reach out through our <a href="/contact-us" class="text-brand-link hover:underline">Contact Us</a> page.
+          If you have suggestions, found a bug, or just want to say hello, don't hesitate to reach out through our <a href={translatePath('/contact-us')} class="text-brand-link hover:underline">Contact Us</a> page.
         </p>
       </section>
 
       <section>
         <h2 class="text-lg font-semibold text-ink mb-3">Get Started</h2>
         <p>
-          Ready to calculate? Head back to our <a href="/" class="text-brand-link hover:underline">calculator</a> and start computing.
+          Ready to calculate? Head back to our <a href={translatePath('/')} class="text-brand-link hover:underline">calculator</a> and start computing.
         </p>
       </section>
 

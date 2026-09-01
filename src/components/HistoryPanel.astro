@@ -1,37 +1,49 @@
 ---
 // src/components/HistoryPanel.astro
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import type { SupportedLanguage } from '../i18n/ui';
+
+interface Props {
+  lang?: SupportedLanguage;
+}
+
+const detectedLang = getLangFromUrl(Astro.url);
+const { lang = detectedLang } = Astro.props;
+const t = useTranslations(lang);
 ---
 
 <div class="flex flex-col gap-4 bg-canvas border border-hairline rounded-lg p-5 shadow-sm h-full max-h-[300px] overflow-hidden">
   <div class="flex items-center justify-between border-b border-hairline pb-3">
     <div class="flex items-center gap-2">
       <span class="inline-block w-2.5 h-2.5 rounded-full bg-brand-violet"></span>
-      <h3 class="text-xs font-semibold tracking-tight uppercase font-geist-mono text-body">Calculation History</h3>
+      <h3 class="text-xs font-semibold tracking-tight uppercase font-geist-mono text-body">{t('history.title')}</h3>
     </div>
     <button id="clear-history-btn" class="text-[10px] font-geist-mono text-mute hover:text-brand-error cursor-pointer">
-      [clear]
+      {t('history.clear')}
     </button>
   </div>
 
-  <div id="history-list" class="flex-1 overflow-y-auto flex flex-col gap-3 font-geist-mono text-xs no-scrollbar">
-    <div class="text-mute italic text-center py-4">No calculations yet.</div>
+  <div id="history-list" class="flex-1 overflow-y-auto flex flex-col gap-3 font-geist-mono text-xs no-scrollbar" data-empty-text={t('history.empty')}>
+    <div class="text-mute italic text-center py-4">{t('history.empty')}</div>
   </div>
 </div>
 
 <script>
   const elList = document.getElementById('history-list');
   const btnClear = document.getElementById('clear-history-btn');
+  const emptyText = elList?.getAttribute('data-empty-text') || 'No calculations yet.';
 
   const renderHistory = () => {
+    if (!elList) return;
     const history = JSON.parse(localStorage.getItem('calc_history') || '[]');
     elList.innerHTML = "";
 
     if (history.length === 0) {
-      elList.innerHTML = `<div class="text-mute italic text-center py-4">No calculations yet.</div>`;
+      elList.innerHTML = `<div class="text-mute italic text-center py-4">${emptyText}</div>`;
       return;
     }
 
-    history.forEach((item, index) => {
+    history.forEach((item: { expr: string; res: string }) => {
       const row = document.createElement('button');
       row.className = "flex flex-col items-end gap-1 p-2.5 rounded-md hover:bg-canvas-soft border border-transparent hover:border-hairline transition-all w-full text-right cursor-pointer select-none";
       row.innerHTML = `
@@ -53,11 +65,13 @@
   window.addEventListener('historyUpdated', renderHistory);
 
   // Clear history handler
-  btnClear.addEventListener('click', (e) => {
-    e.preventDefault();
-    localStorage.setItem('calc_history', '[]');
-    renderHistory();
-  });
+  if (btnClear) {
+    btnClear.addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.setItem('calc_history', '[]');
+      renderHistory();
+    });
+  }
 
   // Initial render on load
   renderHistory();

@@ -7,6 +7,14 @@ export default defineConfig({
   site: 'https://onscicalc.com',
   trailingSlash: 'never',
 
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'es', 'fr', 'de', 'pt', 'hi', 'zh', 'ja', 'ar', 'ru'],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
+
   devToolbar: {
     enabled: false,
   },

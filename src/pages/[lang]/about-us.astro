@@ -1,0 +1,91 @@
+---
+// src/pages/[lang]/about-us.astro
+import StaticPage from '../../layouts/StaticPage.astro';
+import { languages, type SupportedLanguage } from '../../i18n/ui';
+import { useTranslations, useTranslatedPath } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return (Object.keys(languages) as SupportedLanguage[])
+    .filter((l) => l !== 'en')
+    .map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: SupportedLanguage };
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const pageUrl = `https://onscicalc.com/${lang}/about-us`;
+
+const aboutPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "@id": `${pageUrl}/#webpage`,
+  "url": pageUrl,
+  "name": t('about.title'),
+  "description": t('about.desc'),
+  "inLanguage": lang,
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "https://onscicalc.com/#website"
+  },
+  "mainEntity": {
+    "@type": "Organization",
+    "@id": "https://onscicalc.com/#organization"
+  }
+};
+---
+
+<StaticPage 
+  title={t('about.title')}
+  description={t('about.desc')}
+  canonical={pageUrl}
+  breadcrumbs={[{ name: t('nav.about'), url: `/${lang}/about-us` }]}
+  jsonLd={aboutPageSchema}
+  lang={lang}
+>
+
+  <article class="prose-custom">
+    <h1 class="text-2xl md:text-3xl font-bold text-ink font-geist tracking-tight mb-2">{t('nav.about')}</h1>
+    <p class="text-sm text-ink/50 font-geist mb-8">{t('brand.tagline')}</p>
+
+    <div class="space-y-6 text-sm leading-relaxed text-ink/70 font-geist">
+
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('seo.h1')}</h2>
+        <p>{t('seo.p1')}</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('seo.h2_why')}</h2>
+        <p>{t('seo.p_why')}</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('seo.h2_funcs')}</h2>
+        <p>{t('seo.p_funcs')}</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('seo.h2_eng')}</h2>
+        <p>{t('seo.p_eng')}</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('seo.h2_features')}</h2>
+        <p>{t('seo.p_features')}</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-ink mb-3">{t('seo.h2_access')}</h2>
+        <p>{t('seo.p_access')}</p>
+      </section>
+
+      <section class="pt-4 border-t border-hairline">
+        <p>
+          <a href={translatePath('/')} class="text-brand-link font-medium hover:underline">← {t('nav.calculator')}</a>
+        </p>
+      </section>
+
+    </div>
+  </article>
+
+</StaticPage>

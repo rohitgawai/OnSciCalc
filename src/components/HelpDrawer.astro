@@ -1,10 +1,16 @@
 ---
 // src/components/HelpDrawer.astro
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import type { SupportedLanguage } from '../i18n/ui';
+
 interface Props {
   mode?: 'mobile' | 'desktop' | 'all';
+  lang?: SupportedLanguage;
 }
 
-const { mode = 'all' } = Astro.props;
+const detectedLang = getLangFromUrl(Astro.url);
+const { mode = 'all', lang = detectedLang } = Astro.props;
+const t = useTranslations(lang);
 ---
 
 { (mode === 'all' || mode === 'mobile') && (
@@ -13,80 +19,86 @@ const { mode = 'all' } = Astro.props;
       <div class="flex items-center justify-between border-b border-hairline pb-3">
         <div class="flex items-center gap-2">
           <span class="inline-block w-2.5 h-2.5 rounded-full bg-brand-cyan"></span>
-          <h3 class="text-sm font-semibold tracking-tight uppercase font-geist-mono text-body">Calculator Guide</h3>
+          <h3 class="text-sm font-semibold tracking-tight uppercase font-geist-mono text-body">{t('guide.calc_guide')}</h3>
         </div>
         <button id="close-help-drawer" class="text-mute hover:text-ink text-sm p-1 cursor-pointer font-geist-mono">
-          [close]
+          {t('guide.close')}
         </button>
       </div>
       
       <div class="flex flex-col gap-5 text-sm overflow-y-auto">
         <div class="flex flex-col gap-1.5">
-          <h4 class="font-medium text-ink">Operator Precedence</h4>
+          <h4 class="font-medium text-ink">{t('guide.precedence_title')}</h4>
           <p class="text-body text-xs leading-relaxed">
-            OnSciCalc evaluates math expressions in standard algebraic order:
-            <span class="font-semibold">Parentheses &rarr; Exponents &rarr; Functions &rarr; Multiplication/Division &rarr; Addition/Subtraction</span>.
+            {t('guide.precedence_desc')}
           </p>
+          <div class="p-2.5 bg-canvas-soft border border-hairline rounded-md font-geist-mono text-[10px] text-brand-link flex flex-col gap-1">
+            <div>{t('guide.p1')} <span class="text-mute">( ... )</span></div>
+            <div>{t('guide.p2')} <span class="text-mute">x^y</span></div>
+            <div>{t('guide.p3')} <span class="text-mute">sin, ln</span></div>
+            <div>{t('guide.p4')} <span class="text-mute">*, /</span></div>
+            <div>{t('guide.p5')} <span class="text-mute">+, -</span></div>
+          </div>
         </div>
 
         <div class="border-t border-hairline my-1"></div>
 
         <div class="flex flex-col gap-3">
-          <h4 class="font-medium text-ink">Key Scientific Operations</h4>
+          <h4 class="font-medium text-ink">{t('guide.concepts_title')}</h4>
           
           <div class="flex flex-col gap-3 font-geist-mono text-xs">
             <!-- Exponents -->
             <div class="bg-canvas-soft border border-hairline p-3 rounded-md flex flex-col gap-1">
               <div class="flex justify-between font-semibold text-ink">
-                <span>Exponent (x^y)</span>
+                <span>{t('guide.exponent_title')}</span>
                 <span class="text-brand-link">2^3</span>
               </div>
-              <p class="text-mute text-[10px] leading-normal">Raises base x to power y. Evaluates to 8.</p>
+              <p class="text-mute text-[10px] leading-normal">{t('guide.exponent_desc')}</p>
             </div>
 
             <!-- Functions -->
             <div class="bg-canvas-soft border border-hairline p-3 rounded-md flex flex-col gap-1">
               <div class="flex justify-between font-semibold text-ink">
-                <span>Trig (sin, cos, tan)</span>
+                <span>{t('guide.trig_title')}</span>
                 <span class="text-brand-link">sin(30)</span>
               </div>
-              <p class="text-mute text-[10px] leading-normal">Trigonometric functions. Toggle DEG/RAD mode. sin(30) in DEG is 0.5.</p>
+              <p class="text-mute text-[10px] leading-normal">{t('guide.trig_desc')}</p>
               <p class="text-mute text-[10px] leading-normal border-t border-hairline pt-1 mt-1">
-                💡 <strong>2nd Shift:</strong> Toggle the <strong>2nd</strong> button for shifted functions: <strong>sin⁻¹/cos⁻¹/tan⁻¹</strong> (inverse trig), <strong>∛</strong> (cube root), <strong>x³</strong> (cube), <strong>eˣ</strong> (exponential), <strong>10ˣ</strong> (power of 10).
+                💡 {t('guide.shift_tip')}
               </p>
             </div>
 
             <!-- Parentheses -->
             <div class="bg-canvas-soft border border-hairline p-3 rounded-md flex flex-col gap-1">
               <div class="flex justify-between font-semibold text-ink">
-                <span>Parentheses ( )</span>
+                <span>{t('guide.implicit_title')}</span>
                 <span class="text-brand-link">(2+3)*4</span>
               </div>
-              <p class="text-mute text-[10px] leading-normal">Forces specific groupings. Evaluates to 20, whereas 2+3*4 is 14.</p>
+              <p class="text-mute text-[10px] leading-normal">{t('guide.implicit_desc')}</p>
             </div>
 
             <!-- Logarithms -->
             <div class="bg-canvas-soft border border-hairline p-3 rounded-md flex flex-col gap-1">
               <div class="flex justify-between font-semibold text-ink">
-                <span>Logarithms (ln, log)</span>
+                <span>{t('guide.log_title')}</span>
                 <span class="text-brand-link">log(100)</span>
               </div>
-              <p class="text-mute text-[10px] leading-normal">log is base-10 (evaluates to 2). ln is natural base-e.</p>
+              <p class="text-mute text-[10px] leading-normal">{t('guide.log_desc')}</p>
             </div>
 
             <!-- Factorials -->
             <div class="bg-canvas-soft border border-hairline p-3 rounded-md flex flex-col gap-1">
               <div class="flex justify-between font-semibold text-ink">
-                <span>Factorial (n!)</span>
+                <span>{t('guide.factorial_title')}</span>
                 <span class="text-brand-link">4!</span>
               </div>
-              <p class="text-mute text-[10px] leading-normal">Multiplies all positive integers down to 1. Evaluates to 24.</p>
+              <p class="text-mute text-[10px] leading-normal">{t('guide.factorial_desc')}</p>
             </div>
           </div>
         </div>
         
-        <div class="bg-canvas-soft-2 border border-hairline rounded-md p-3 text-[11px] leading-normal text-body">
-          <span class="font-semibold text-ink">💡 Tip:</span> You can type expressions using your physical keyboard. Enter computes <code class="bg-canvas p-0.5 rounded border border-hairline text-brand-link font-geist-mono text-[10px] font-bold">=</code>, Backspace deletes last character, and Escape clears all. Type <code class="bg-canvas p-0.5 rounded border border-hairline text-ink font-geist-mono text-[10px]">Shift+S/C/T</code> for inverse trig functions.
+        <div class="bg-canvas-soft-2 border border-hairline rounded-md p-3 text-[11px] leading-normal text-body font-geist-mono">
+          <span class="font-semibold text-ink">💡 {t('guide.keyboard_title')}</span> {t('guide.keyboard_desc')}
         </div>
       </div>
     </div>
@@ -97,73 +109,73 @@ const { mode = 'all' } = Astro.props;
   <div class="hidden lg:flex flex-col gap-6 bg-canvas border border-hairline rounded-lg p-6 shadow-sm h-full overflow-y-auto">
     <div class="flex items-center gap-2 border-b border-hairline pb-4">
       <span class="inline-block w-2.5 h-2.5 rounded-full bg-brand-cyan"></span>
-      <h3 class="text-xs font-semibold tracking-tight uppercase font-geist-mono text-body">Scientific Guide</h3>
+      <h3 class="text-xs font-semibold tracking-tight uppercase font-geist-mono text-body">{t('guide.title')}</h3>
     </div>
 
     <div class="flex flex-col gap-4 text-xs">
       <div class="flex flex-col gap-1.5">
-        <h4 class="font-medium text-ink text-sm">Precedence Rules</h4>
+        <h4 class="font-medium text-ink text-sm">{t('guide.precedence_title')}</h4>
         <p class="text-body leading-relaxed">
-          OnSciCalc evaluates operations strictly in mathematical sequence:
+          {t('guide.precedence_desc')}
         </p>
         <div class="p-2.5 bg-canvas-soft border border-hairline rounded-md font-geist-mono text-[10px] text-brand-link flex flex-col gap-1">
-          <div>1. Parentheses <span class="text-mute">( ... )</span></div>
-          <div>2. Exponents <span class="text-mute">x^y</span></div>
-          <div>3. Trig / Log Functions <span class="text-mute">sin, ln</span></div>
-          <div>4. Multiply / Divide <span class="text-mute">*, /</span></div>
-          <div>5. Add / Subtract <span class="text-mute">+, -</span></div>
+          <div>{t('guide.p1')} <span class="text-mute">( ... )</span></div>
+          <div>{t('guide.p2')} <span class="text-mute">x^y</span></div>
+          <div>{t('guide.p3')} <span class="text-mute">sin, ln</span></div>
+          <div>{t('guide.p4')} <span class="text-mute">*, /</span></div>
+          <div>{t('guide.p5')} <span class="text-mute">+, -</span></div>
         </div>
       </div>
 
       <div class="border-t border-hairline my-2"></div>
 
-      <h4 class="font-medium text-ink text-sm">Concepts & Reference</h4>
+      <h4 class="font-medium text-ink text-sm">{t('guide.concepts_title')}</h4>
       
       <div class="flex flex-col gap-3 font-geist-mono text-[11px]">
         <!-- Exponent -->
         <div class="bg-canvas-soft border border-hairline p-3 rounded-md flex flex-col gap-1.5">
           <div class="flex justify-between font-semibold text-ink">
-            <span>Exponentification</span>
+            <span>{t('guide.exponent_title')}</span>
             <span class="text-brand-link">5^2</span>
           </div>
-          <p class="text-mute text-[10px] leading-normal">Multiply a number by itself. 5^2 evaluates to 25.</p>
+          <p class="text-mute text-[10px] leading-normal">{t('guide.exponent_desc')}</p>
         </div>
 
         <!-- Trigonometry -->
         <div class="bg-canvas-soft border border-hairline p-3 rounded-md flex flex-col gap-1.5">
           <div class="flex justify-between font-semibold text-ink">
-            <span>Trig Functions</span>
+            <span>{t('guide.trig_title')}</span>
             <span class="text-brand-link">cos(pi)</span>
           </div>
-          <p class="text-mute text-[10px] leading-normal">Angles measured in radians or degrees. cos(pi) in RAD is -1.</p>
+          <p class="text-mute text-[10px] leading-normal">{t('guide.trig_desc')}</p>
           <p class="text-mute text-[10px] leading-normal border-t border-hairline pt-1 mt-1">
-            💡 <strong>2nd Shift:</strong> Toggle the <strong>2nd</strong> button for shifted functions: <strong>sin⁻¹/cos⁻¹/tan⁻¹</strong> (inverse trig), <strong>∛</strong> (cube root), <strong>x³</strong> (cube), <strong>eˣ</strong> (exponential), <strong>10ˣ</strong> (power of 10).
+            💡 {t('guide.shift_tip')}
           </p>
         </div>
 
         <!-- Parentheses -->
         <div class="bg-canvas-soft border border-hairline p-3 rounded-md flex flex-col gap-1.5">
           <div class="flex justify-between font-semibold text-ink">
-            <span>Implicit Multi.</span>
+            <span>{t('guide.implicit_title')}</span>
             <span class="text-brand-link">3(4+2)</span>
           </div>
-          <p class="text-mute text-[10px] leading-normal">Evaluates automatically to 3 * (4+2) = 18.</p>
+          <p class="text-mute text-[10px] leading-normal">{t('guide.implicit_desc')}</p>
         </div>
 
         <!-- Logarithms -->
         <div class="bg-canvas-soft border border-hairline p-3 rounded-md flex flex-col gap-1.5">
           <div class="flex justify-between font-semibold text-ink">
-            <span>Log / Natural Log</span>
+            <span>{t('guide.log_title')}</span>
             <span class="text-brand-link">ln(e)</span>
           </div>
-          <p class="text-mute text-[10px] leading-normal">ln stands for natural log (base e). ln(e) evaluates to 1.</p>
+          <p class="text-mute text-[10px] leading-normal">{t('guide.log_desc')}</p>
         </div>
       </div>
     </div>
 
     <div class="mt-auto pt-4 border-t border-hairline bg-canvas-soft-2 rounded-md p-3 text-[11px] leading-normal text-body font-geist-mono">
-      <span class="font-bold text-ink">Keyboard Support:</span><br/>
-      Type standard digits, operators (+, -, *, /), parentheses, or exponents (^). Hit <code class="bg-canvas px-1 rounded border border-hairline text-ink font-semibold">Enter</code> for equals, and <code class="bg-canvas px-1 rounded border border-hairline text-ink font-semibold">Esc</code> to clear. Press <code class="bg-canvas px-1 rounded border border-hairline text-ink font-semibold">Shift+S/C/T</code> for inverse trig functions (or type <code class="bg-canvas px-1 rounded border border-hairline text-ink font-semibold">asin</code>, <code class="bg-canvas px-1 rounded border border-hairline text-ink font-semibold">acos</code>, <code class="bg-canvas px-1 rounded border border-hairline text-ink font-semibold">atan</code>).
+      <span class="font-bold text-ink">{t('guide.keyboard_title')}</span><br/>
+      {t('guide.keyboard_desc')}
     </div>
   </div>
 )}
