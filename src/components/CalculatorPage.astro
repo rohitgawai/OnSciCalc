@@ -18,9 +18,21 @@ const translatePath = useTranslatedPath(lang);
 
 const siteUrl = "https://onscicalc.com";
 const pageUrl = lang === 'en' ? siteUrl : `${siteUrl}/${lang}`;
+const privacyUrl = lang === 'en' ? `${siteUrl}/privacy-policy` : `${siteUrl}/${lang}/privacy-policy`;
 const pageTitle = t('meta.home_title');
 const pageDesc = t('meta.home_desc');
 const pageKeywords = t('meta.home_keywords');
+
+const calculatorQuestionTypes = [
+  "Arithmetic",
+  "Algebra",
+  "Trigonometry",
+  "Logarithmic Equation",
+  "Polynomial Equation",
+  "Polynomial Expression",
+  "Rational Expression",
+  "Function"
+];
 
 const faqQuestions = [
   { q: t('faq.q1'), a: t('faq.a1') },
@@ -39,16 +51,20 @@ const faqQuestions = [
   <!-- Structured Data: Math Solver -->
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "MathSolver",
+    "@type": ["MathSolver", "LearningResource"],
     "@id": `${pageUrl}/#mathsolver`,
     "name": `${t('brand.name')} ${t('meta.home_title')}`,
     "url": pageUrl,
     "description": pageDesc,
-    "mathSolverType": "ScientificCalculator",
-    "potentialAction": {
+    "learningResourceType": "Math Solver",
+    "inLanguage": lang,
+    "usageInfo": privacyUrl,
+    "potentialAction": [{
       "@type": "SolveMathAction",
-      "target": `${pageUrl}/?expr={math_expression}`
-    }
+      "target": `${pageUrl}/?expr={math_expression}`,
+      "mathExpression-input": "required name=math_expression",
+      "eduQuestionType": calculatorQuestionTypes
+    }]
   })} />
 
   <!-- Structured Data: Software Application -->

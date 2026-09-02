@@ -20,13 +20,14 @@ const translatePath = useTranslatedPath(lang);
 const siteUrl = "https://onscicalc.com";
 const toolBasePath = `/tools/${tool}`;
 const canonicalUrl = lang === 'en' ? `${siteUrl}${toolBasePath}` : `${siteUrl}/${lang}${toolBasePath}`;
+const privacyUrl = lang === 'en' ? `${siteUrl}/privacy-policy` : `${siteUrl}/${lang}/privacy-policy`;
 
 let pageTitle = '';
 let pageDesc = '';
 let pageKeywords = '';
 let heading1 = '';
 let subtitle = '';
-let mathSolverType = '';
+let eduQuestionTypes: string[] = [];
 
 if (tool === 'fraction-calculator') {
   pageTitle = t('tool.fraction_title');
@@ -34,21 +35,21 @@ if (tool === 'fraction-calculator') {
   pageKeywords = t('tool.fraction_keywords');
   heading1 = t('tool.fraction_h1');
   subtitle = t('tool.fraction_subtitle');
-  mathSolverType = 'FractionCalculator';
+  eduQuestionTypes = ['Arithmetic', 'Rational Expression', 'Rational Equation'];
 } else if (tool === 'trigonometry-calculator') {
   pageTitle = t('tool.trig_title');
   pageDesc = t('tool.trig_desc');
   pageKeywords = t('tool.trig_keywords');
   heading1 = t('tool.trig_h1');
   subtitle = t('tool.trig_subtitle');
-  mathSolverType = 'TrigonometryCalculator';
+  eduQuestionTypes = ['Trigonometry', 'Algebra'];
 } else if (tool === 'logarithm-calculator') {
   pageTitle = t('tool.log_title');
   pageDesc = t('tool.log_desc');
   pageKeywords = t('tool.log_keywords');
   heading1 = t('tool.log_h1');
   subtitle = t('tool.log_subtitle');
-  mathSolverType = 'LogarithmCalculator';
+  eduQuestionTypes = ['Logarithmic Equation', 'Algebra', 'Exponential Equation'];
 }
 ---
 
@@ -62,16 +63,20 @@ if (tool === 'fraction-calculator') {
   <!-- Structured Data: Math Solver -->
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "MathSolver",
+    "@type": ["MathSolver", "LearningResource"],
     "@id": `${canonicalUrl}/#mathsolver`,
     "name": `${t('brand.name')} ${heading1}`,
     "url": canonicalUrl,
     "description": pageDesc,
-    "mathSolverType": mathSolverType,
-    "potentialAction": {
+    "learningResourceType": "Math Solver",
+    "inLanguage": lang,
+    "usageInfo": privacyUrl,
+    "potentialAction": [{
       "@type": "SolveMathAction",
-      "target": `${canonicalUrl}?expr={math_expression}`
-    }
+      "target": `${canonicalUrl}?expr={math_expression}`,
+      "mathExpression-input": "required name=math_expression",
+      "eduQuestionType": eduQuestionTypes
+    }]
   })} />
 
   <!-- Structured Data: WebApplication -->
