@@ -37,7 +37,7 @@ const {
 const siteName = "OnSciCalc";
 const siteUrl = "https://onscicalc.com";
 const isRtl = isRtlLang(lang);
-const currentCanonical = canonical || `${siteUrl}${Astro.url.pathname === '/' ? '/' : Astro.url.pathname.replace(/\/$/, '')}`;
+const currentCanonical = canonical || (Astro.url.pathname === '/' ? siteUrl : `${siteUrl}${Astro.url.pathname.replace(/\/$/, '')}`);
 const alternateLinks = getAlternateHreflangLinks(Astro.url.pathname, siteUrl);
 const currentOgLocale = getOgLocale(lang);
 
@@ -51,7 +51,7 @@ const globalGraphSchema = {
     {
       "@type": "WebSite",
       "@id": "https://onscicalc.com/#website",
-      "url": "https://onscicalc.com/",
+      "url": "https://onscicalc.com",
       "name": "OnSciCalc",
       "alternateName": [
         "Online Scientific Calculator",
@@ -62,21 +62,13 @@ const globalGraphSchema = {
       "inLanguage": Object.keys(ogLocales),
       "publisher": {
         "@id": "https://onscicalc.com/#organization"
-      },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://onscicalc.com/?expr={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
       }
     },
     {
       "@type": "Organization",
       "@id": "https://onscicalc.com/#organization",
       "name": "OnSciCalc",
-      "url": "https://onscicalc.com/",
+      "url": "https://onscicalc.com",
       "logo": {
         "@type": "ImageObject",
         "@id": "https://onscicalc.com/#logo",
@@ -118,19 +110,17 @@ const extraJsonLdArray = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : 
 
 		<!-- Primary SEO Meta Tags -->
 		<title>{title}</title>
-		<meta name="title" content={title} />
 		<meta name="description" content={description} />
-		<meta name="keywords" content={keywords} />
 		<meta name="author" content={author} />
 		<meta name="publisher" content="OnSciCalc" />
 		<meta name="robots" content={robots} />
 		<meta name="googlebot" content={robots} />
 		<meta name="bingbot" content={robots} />
-		<meta name="rating" content="general" />
-		<meta name="revisit-after" content="7 days" />
 		<meta name="format-detection" content="telephone=no" />
 		<meta name="color-scheme" content="light dark" />
-		<link rel="canonical" href={currentCanonical} />
+		{!robots?.includes('noindex') && currentCanonical && (
+			<link rel="canonical" href={currentCanonical} />
+		)}
 
 		<!-- Hreflang Multi-Language Alternate Links for Global SEO -->
 		{alternateLinks.map((alt) => (

@@ -84,7 +84,7 @@ export function getAlternateHreflangLinks(pathname: string, siteUrl = 'https://o
   const alternates = (Object.keys(languages) as SupportedLanguage[]).map((l) => {
     let href: string;
     if (!showDefaultLang && l === defaultLang) {
-      href = `${siteUrl}${normalizedBase || '/'}`;
+      href = normalizedBase ? `${siteUrl}${normalizedBase}` : siteUrl;
     } else {
       href = `${siteUrl}/${l}${normalizedBase}`;
     }
@@ -97,7 +97,7 @@ export function getAlternateHreflangLinks(pathname: string, siteUrl = 'https://o
   // Add x-default pointing to default locale (English)
   alternates.push({
     hreflang: 'x-default',
-    href: `${siteUrl}${normalizedBase || '/'}`,
+    href: normalizedBase ? `${siteUrl}${normalizedBase}` : siteUrl,
   });
 
   return alternates;

@@ -24,14 +24,14 @@ const pageDesc = t('meta.home_desc');
 const pageKeywords = t('meta.home_keywords');
 
 const calculatorQuestionTypes = [
-  "Arithmetic",
-  "Algebra",
-  "Trigonometry",
-  "Logarithmic Equation",
   "Polynomial Equation",
   "Polynomial Expression",
+  "Trigonometric Equation",
+  "Logarithmic Equation",
+  "Exponential Equation",
   "Rational Expression",
-  "Function"
+  "Linear Equation",
+  "Quadratic Equation"
 ];
 
 const faqQuestions = [
@@ -204,13 +204,16 @@ const faqQuestions = [
     <!-- SEO Content Section -->
     <div class="w-full max-w-6xl mx-auto px-4 md:px-6 lg:px-8 pb-8 z-10 relative">
       <details class="group">
-        <summary class="hidden md:block cursor-pointer text-sm text-ink/50 hover:text-ink/70 transition-colors duration-200 py-3 border-t border-hairline">
-          <span class="group-open:hidden">{t('seo.about_toggle')}</span>
-          <span class="hidden group-open:inline">{t('seo.about_toggle_close')}</span>
+        <summary class="cursor-pointer text-sm text-ink/60 hover:text-ink/80 transition-colors duration-200 py-3 border-t border-hairline flex items-center justify-between">
+          <span>
+            <span class="group-open:hidden">{t('seo.about_toggle')}</span>
+            <span class="hidden group-open:inline">{t('seo.about_toggle_close')}</span>
+          </span>
+          <span class="text-xs text-ink/40 group-open:rotate-180 transition-transform duration-200">▼</span>
         </summary>
-        <div class="hidden md:block group-open:block text-sm leading-relaxed text-ink/60 space-y-4 pt-2">
+        <div class="text-sm leading-relaxed text-ink/60 space-y-4 pt-2">
           
-          <h2 class="text-base font-semibold text-ink/80">{t('seo.h1')}</h2>
+          <h1 class="text-base sm:text-lg font-semibold text-ink/85 font-geist tracking-tight">{t('seo.h1')}</h1>
           <p>{t('seo.p1')}</p>
 
           <h3 class="text-sm font-medium text-ink/75">{t('seo.h2_why')}</h3>
